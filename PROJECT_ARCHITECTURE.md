@@ -23,20 +23,20 @@
 
 ## 2. 技术栈速查
 
-| 类别 | 选型 | 版本 |
-|---|---|---|
-| 运行时 | .NET | **8.0** |
-| Web 框架 | ASP.NET Core Web API（Controller-based，**非 Minimal API**） | 8.x |
-| ORM | Entity Framework Core | 9.0.10 |
-| 数据库 | **PostgreSQL（Supabase 托管）** | Npgsql.EntityFrameworkCore.PostgreSQL 9.0.4 |
-| 身份系统 | ASP.NET Core Identity（仅用 `IdentityUser`，未启用 Roles 表） | 8.x |
-| Token | JWT Bearer（HmacSha256 对称密钥） | Microsoft.IdentityModel.Tokens 8.14.0 |
-| 第三方登录 | Google OAuth 2.0 ID Token 校验 | Google.Apis.Auth 1.73.0 |
-| 对象映射 | AutoMapper | 12.0.1 |
-| API 文档 | Swashbuckle (Swagger / OpenAPI) | 6.4.0 |
-| 缓存 | ASP.NET Core OutputCache（内存，按 Tag 失效） | 内置 |
-| 压缩 | ResponseCompression（Brotli + Gzip，Optimal） | 内置 |
-| 部署 | Azure Web App + GitHub Actions | — |
+| 类别       | 选型                                                          | 版本                                        |
+| ---------- | ------------------------------------------------------------- | ------------------------------------------- |
+| 运行时     | .NET                                                          | **8.0**                                     |
+| Web 框架   | ASP.NET Core Web API（Controller-based，**非 Minimal API**）  | 8.x                                         |
+| ORM        | Entity Framework Core                                         | 9.0.10                                      |
+| 数据库     | **PostgreSQL（Supabase 托管）**                               | Npgsql.EntityFrameworkCore.PostgreSQL 9.0.4 |
+| 身份系统   | ASP.NET Core Identity（仅用 `IdentityUser`，未启用 Roles 表） | 8.x                                         |
+| Token      | JWT Bearer（HmacSha256 对称密钥）                             | Microsoft.IdentityModel.Tokens 8.14.0       |
+| 第三方登录 | Google OAuth 2.0 ID Token 校验                                | Google.Apis.Auth 1.73.0                     |
+| 对象映射   | AutoMapper                                                    | 12.0.1                                      |
+| API 文档   | Swashbuckle (Swagger / OpenAPI)                               | 6.4.0                                       |
+| 缓存       | ASP.NET Core OutputCache（内存，按 Tag 失效）                 | 内置                                        |
+| 压缩       | ResponseCompression（Brotli + Gzip，Optimal）                 | 内置                                        |
+| 部署       | Azure Web App + GitHub Actions                                | —                                           |
 
 > **注意**：`readme.md` 里写的 SQL Server / Azure SQL **已不再使用**。`tools/DataMigration/` 是一次性的"Azure SQL → Postgres"迁移工具，迁移完成后该目录可删除（已通过 `.csproj` 中 `<DefaultItemExcludes>$(DefaultItemExcludes);tools/**</DefaultItemExcludes>` 排除在主项目编译之外）。
 
@@ -100,14 +100,14 @@ ThisisczApi/                           # ← 仓库根 = 项目根
 
 ### 命名空间约定
 
-| 文件夹 | namespace |
-|---|---|
-| 根 (`Program.cs`, `ApplicationDbContext.cs`) | `ThisisczApi` |
-| `Controllers/` | `ThisisczApi.Controllers` |
-| `Entities/` | `ThisisczApi.Entities` |
-| `DTOs/` | `ThisisczApi.DTOs` |
-| `Services/` | `ThisisczApi.Services` |
-| `utilities/`（目录小写） | `ThisisczApi.Utilities`（命名空间大写） |
+| 文件夹                                       | namespace                               |
+| -------------------------------------------- | --------------------------------------- |
+| 根 (`Program.cs`, `ApplicationDbContext.cs`) | `ThisisczApi`                           |
+| `Controllers/`                               | `ThisisczApi.Controllers`               |
+| `Entities/`                                  | `ThisisczApi.Entities`                  |
+| `DTOs/`                                      | `ThisisczApi.DTOs`                      |
+| `Services/`                                  | `ThisisczApi.Services`                  |
+| `utilities/`（目录小写）                     | `ThisisczApi.Utilities`（命名空间大写） |
 
 ---
 
@@ -205,14 +205,14 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 ### JWT 配置
 
-| 参数 | 值 | 备注 |
-|---|---|---|
-| 算法 | HmacSha256（对称） | |
-| Key | `appsettings.json` `Jwt:Key` | ⚠️ 当前明文入库，需通过环境变量/Key Vault 覆盖 |
-| Issuer / Audience | 配置中有，但**校验已关闭** | `ValidateIssuer = false`、`ValidateAudience = false` |
-| Lifetime | `Jwt:ExpireMinutes`（当前 2400 = 40h） | |
-| ClockSkew | `TimeSpan.Zero` | 严格按过期时间 |
-| `MapInboundClaims` | `false` | 保留原始 claim type（重要！代码里直接读 `"email"` `"role"`） |
+| 参数               | 值                                     | 备注                                                         |
+| ------------------ | -------------------------------------- | ------------------------------------------------------------ |
+| 算法               | HmacSha256（对称）                     |                                                              |
+| Key                | `appsettings.json` `Jwt:Key`           | ⚠️ 当前明文入库，需通过环境变量/Key Vault 覆盖               |
+| Issuer / Audience  | 配置中有，但**校验已关闭**             | `ValidateIssuer = false`、`ValidateAudience = false`         |
+| Lifetime           | `Jwt:ExpireMinutes`（当前 2400 = 40h） |                                                              |
+| ClockSkew          | `TimeSpan.Zero`                        | 严格按过期时间                                               |
+| `MapInboundClaims` | `false`                                | 保留原始 claim type（重要！代码里直接读 `"email"` `"role"`） |
 
 ### Authorization Policy
 
@@ -224,10 +224,10 @@ options.AddPolicy("IsAdmin", policy => policy.RequireClaim("role", "admin"));
 
 ### Controller 上的鉴权写法（**这是项目惯例，请保持一致**）
 
-| 用途 | 写法 |
-|---|---|
-| 公开接口 | 不加 `[Authorize]` |
-| 仅需登录 | `[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]` |
+| 用途     | 写法                                                                                              |
+| -------- | ------------------------------------------------------------------------------------------------- |
+| 公开接口 | 不加 `[Authorize]`                                                                                |
+| 仅需登录 | `[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]`                     |
 | 仅 admin | `[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]` |
 
 > 必须显式指定 `AuthenticationSchemes`，因为 Identity 默认 Scheme 是 Cookie，不指定会导致 401。
@@ -248,25 +248,25 @@ var user = await usersService.GetCurrentUser();   // 返回 UserDTO（含 Id / E
 
 ## 7. API 路由总览
 
-| Method | 路径 | 鉴权 | 说明 |
-|---|---|---|---|
-| **POST** | `/api/users/google-login` | 公开 | Google 登录，返回 JWT |
-| **GET** | `/api/users/me` | 已登录 | 当前用户信息 |
-| **GET** | `/api/posts?page=&pageSize=&category=` | 公开（登录后会带 `isLikedByCurrentUser`） | 分页列表 |
-| **GET** | `/api/posts/{id}` | 公开（同上） | 详情 |
-| **POST** | `/api/posts` | admin | 创建 |
-| **PUT** | `/api/posts/{id}` | admin | 更新 |
-| **POST** | `/api/posts/postLike` | 已登录 | 点赞/取消（按 body 的 `IsLiked` 切换） |
-| **GET** | `/api/comments?postId=&parentId=&page=&pageSize=` | 公开 | `parentId=null`→顶级评论；否则→指定父评论的回复 |
-| **POST** | `/api/comments/create` | 已登录 | 创建评论/回复 |
-| **DELETE** | `/api/comments/{id}` | 评论作者本人 或 admin | 递归删除 |
-| **GET** | `/api/links?page=&pageSize=&category=` | 公开 | 分页列表 |
-| **GET** | `/api/links/{id}` | 公开 | 详情 |
-| **POST** | `/api/links/create` | admin | 创建 |
-| **PUT** | `/api/links/{id}` | admin | 更新（`UserId` 不可被覆盖） |
-| **DELETE** | `/api/links/{id}` | admin | 删除 |
-| **GET** | `/api/health/live` | 公开 | 纯服务存活检查（不依赖数据库） |
-| **GET** | `/api/health/database` | 公开 | 数据库连通性检查 |
+| Method     | 路径                                              | 鉴权                                      | 说明                                            |
+| ---------- | ------------------------------------------------- | ----------------------------------------- | ----------------------------------------------- |
+| **POST**   | `/api/users/google-login`                         | 公开                                      | Google 登录，返回 JWT                           |
+| **GET**    | `/api/users/me`                                   | 已登录                                    | 当前用户信息                                    |
+| **GET**    | `/api/posts?page=&pageSize=&category=`            | 公开（登录后会带 `isLikedByCurrentUser`） | 分页列表                                        |
+| **GET**    | `/api/posts/{id}`                                 | 公开（同上）                              | 详情                                            |
+| **POST**   | `/api/posts`                                      | admin                                     | 创建                                            |
+| **PUT**    | `/api/posts/{id}`                                 | admin                                     | 更新                                            |
+| **POST**   | `/api/posts/postLike`                             | 已登录                                    | 点赞/取消（按 body 的 `IsLiked` 切换）          |
+| **GET**    | `/api/comments?postId=&parentId=&page=&pageSize=` | 公开                                      | `parentId=null`→顶级评论；否则→指定父评论的回复 |
+| **POST**   | `/api/comments/create`                            | 已登录                                    | 创建评论/回复                                   |
+| **DELETE** | `/api/comments/{id}`                              | 评论作者本人 或 admin                     | 递归删除                                        |
+| **GET**    | `/api/links?page=&pageSize=&category=`            | 公开                                      | 分页列表                                        |
+| **GET**    | `/api/links/{id}`                                 | 公开                                      | 详情                                            |
+| **POST**   | `/api/links/create`                               | admin                                     | 创建                                            |
+| **PUT**    | `/api/links/{id}`                                 | admin                                     | 更新（`UserId` 不可被覆盖）                     |
+| **DELETE** | `/api/links/{id}`                                 | admin                                     | 删除                                            |
+| **GET**    | `/api/health/live`                                | 公开                                      | 纯服务存活检查（不依赖数据库）                  |
+| **GET**    | `/api/health/database`                            | 公开                                      | 数据库连通性检查                                |
 
 ### 路由命名不一致点（注意保持向后兼容）
 
@@ -300,6 +300,7 @@ public class Note
 ```
 
 约定：
+
 - 主键统一 `int Id`
 - 外键到用户：`string UserId` + 导航 `IdentityUser User { get; set; } = null!;`
 - 时间字段：`DateTime CreatedAt` + 可空 `DateTime? UpdatedAt`
@@ -324,6 +325,7 @@ modelBuilder.Entity<Note>()
 #### Step 3 — 写 DTOs（在 `DTOs/` 下）
 
 至少 3 个：
+
 - `NoteCreationDTO`：用 `[Required]`、`[StringLength]` 做校验
 - `NoteDTO`：返回给前端，可包含 `UserDTO User` 等导航字段
 - `NoteQueryDTO : PaginationDTO`：列表查询参数
@@ -400,6 +402,7 @@ public class NotesController : ControllerBase
 ```
 
 **关键检查清单**：
+
 - [ ] 只读查询一律加 `AsNoTracking()`
 - [ ] 列表接口用 `[OutputCache(Tags = [cacheKey])]`
 - [ ] 写接口最后调用 `outputCacheStore.EvictByTagAsync(cacheKey, default)` 失效缓存
@@ -473,11 +476,11 @@ return NotFound(new { error = "Note not found" });
   },
   "Jwt": {
     "Key": "<对称密钥，至少 256 bit>",
-    "Issuer": "yourapp",          // ⚠️ 当前未参与校验
-    "Audience": "yourapp_users",  // ⚠️ 当前未参与校验
+    "Issuer": "yourapp", // ⚠️ 当前未参与校验
+    "Audience": "yourapp_users", // ⚠️ 当前未参与校验
     "ExpireMinutes": 2400
   },
-  "allowedOrigins": "http://localhost:3000,https://thisiscz-web.vercel.app,https://thisiscz.vercel.app",
+  "allowedOrigins": "http://localhost:3000,https://www.thisiscz.com,https://thisiscz.vercel.app",
   "Google": {
     "ClientId": "<google-oauth-client-id>"
   },
@@ -509,11 +512,13 @@ return NotFound(new { error = "Note not found" });
 > 这一节是给 AI 与未来的我看的「上下文」。在做修改时，了解这些情况能避免重复造轮子或踩坑。
 
 ### 🔴 安全相关
+
 1. **`appsettings.json` 中明文存放生产凭据**（Postgres 密码、JWT Key、Google ClientId）。修复优先级：高。建议改用环境变量 + Azure Key Vault。
 2. **JWT 关闭了 Issuer/Audience 校验**：`ValidateIssuer = false`、`ValidateAudience = false`。配置里设了 Issuer/Audience 但没用。
 3. **admin 角色判定硬编码**：`email == "zcnftweb@gmail.com"` 在 `UsersController.GoogleLogin` 内。若要扩展管理员，请抽到配置或专门的 `AdminEmails` 列表。
 
 ### 🟡 架构层面
+
 4. **Service 层非常薄**：仅 `UsersService`。业务逻辑（点赞规则、评论递归删除、N+1 聚合、缓存失效）目前都散在 Controller。未来如果业务扩张，应该把 `PostsController` / `CommentsController` 中的逻辑下沉到 `IPostsService` / `ICommentsService`。
 5. **`Services/InMemoryRepository.cs` + `IRepository.cs` 是历史实验代码**，未注册到 DI。可以安全删除。
 6. **`UsersController.cs` 中近 130 行被注释**（旧的密码注册/登录、Refresh Token、HttpOnly Cookie 实现），是有意保留的"备用方案"。新增功能时不要去碰这些注释代码。
@@ -522,6 +527,7 @@ return NotFound(new { error = "Note not found" });
 9. **没有任何测试项目**（无 xUnit/NUnit/集成测试）。
 
 ### 🟢 已经做得好的、不要回退的优化
+
 - DbContext 中的显式索引声明（提交前 review 不要无意删掉）
 - `EnableRetryOnFailure(5, 30s)` + 30s `CommandTimeout`（针对 Supabase 的连接抖动很重要）
 - `UseQuerySplittingBehavior(SplitQuery)` 全局开启
