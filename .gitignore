@@ -1,0 +1,12 @@
+# .NET
+bin/
+obj/
+out/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.idea/
+ScaffoldingReadMe.txt
+*.log
+appsettings.Local.json
