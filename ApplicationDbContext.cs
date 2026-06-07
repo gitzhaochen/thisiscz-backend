@@ -15,6 +15,8 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Link> Links { get; set; }
+    public DbSet<School> Schools { get; set; }
+    public DbSet<RollEthnicityFact> RollEthnicityFacts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -71,6 +73,69 @@ public class ApplicationDbContext : IdentityDbContext
             .WithMany()
             .HasForeignKey(l => l.UserId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<School>().ToTable("schools");
+        modelBuilder.Entity<School>().HasKey(s => s.Id);
+        modelBuilder.Entity<School>().HasIndex(s => s.SchoolId).IsUnique();
+        modelBuilder
+            .Entity<School>()
+            .Property(s => s.Name)
+            .HasMaxLength(200)
+            .IsRequired();
+        modelBuilder
+            .Entity<School>()
+            .Property(s => s.AuthorityClass)
+            .HasMaxLength(50)
+            .IsRequired();
+        modelBuilder
+            .Entity<School>()
+            .Property(s => s.LevelClass)
+            .HasMaxLength(50)
+            .IsRequired();
+        modelBuilder.Entity<School>().Property(s => s.OrgType).HasMaxLength(100);
+        modelBuilder.Entity<School>().Property(s => s.Status).HasMaxLength(50);
+        modelBuilder.Entity<School>().Property(s => s.Region).HasMaxLength(100);
+        modelBuilder.Entity<School>().Property(s => s.TerritorialAuthority).HasMaxLength(100);
+        modelBuilder.Entity<School>().Property(s => s.City).HasMaxLength(100);
+        modelBuilder
+            .Entity<School>()
+            .HasIndex(s => new
+            {
+                s.AuthorityClass,
+                s.LevelClass,
+                s.Status,
+            });
+        modelBuilder.Entity<School>().HasIndex(s => s.Region);
+
+        modelBuilder.Entity<RollEthnicityFact>().ToTable("roll_ethnicity_fact");
+        modelBuilder
+            .Entity<RollEthnicityFact>()
+            .HasKey(r => new
+            {
+                r.SchoolId,
+                r.Year,
+                r.YearLevel,
+                r.Ethnicity,
+            });
+        modelBuilder
+            .Entity<RollEthnicityFact>()
+            .Property(r => r.YearLevel)
+            .HasMaxLength(20)
+            .IsRequired();
+        modelBuilder
+            .Entity<RollEthnicityFact>()
+            .Property(r => r.Ethnicity)
+            .HasMaxLength(50)
+            .IsRequired();
+        modelBuilder.Entity<RollEthnicityFact>().Property(r => r.SourceFile).HasMaxLength(255);
+        modelBuilder.Entity<RollEthnicityFact>().HasIndex(r => new { r.SchoolId, r.Year });
+        modelBuilder
+            .Entity<RollEthnicityFact>()
+            .HasOne(r => r.School)
+            .WithMany(s => s.RollEthnicityFacts)
+            .HasForeignKey(r => r.SchoolId)
+            .HasPrincipalKey(s => s.SchoolId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // 性能优化索引配置
         // Posts 表索引

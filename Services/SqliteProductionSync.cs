@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using ThisisczApi.Entities;
 
 namespace ThisisczApi.Services;
@@ -9,9 +11,10 @@ public static class SqliteProductionSync
     public static async Task<int> RunAsync(IConfiguration configuration)
     {
         var sourceConnectionString = configuration.GetConnectionString("POSTGRES_CONNECTIONSTRING");
-        var targetConnectionString =
+        var targetConnectionString = EnsureSqlitePathReady(
             configuration.GetConnectionString("SQLITE_CONNECTIONSTRING")
-            ?? "Data Source=data/thisiscz-dev.db";
+            ?? "Data Source=data/thisiscz-dev.db"
+        );
 
         if (string.IsNullOrWhiteSpace(sourceConnectionString))
         {
@@ -51,6 +54,8 @@ public static class SqliteProductionSync
             await CopyTableAsync<PostLike>(sourceDb, targetDb);
             await CopyTableAsync<RefreshToken>(sourceDb, targetDb);
             await CopyTableAsync<Link>(sourceDb, targetDb);
+            await TryCopyTableIfExistsAsync<School>(sourceDb, targetDb);
+            await TryCopyTableIfExistsAsync<RollEthnicityFact>(sourceDb, targetDb);
             await CopyTableAsync<Comment>(
                 sourceDb,
                 targetDb,
@@ -66,6 +71,25 @@ public static class SqliteProductionSync
         Console.WriteLine("同步完成。");
         Console.WriteLine($"SQLite 文件：{targetConnectionString}");
         return 0;
+    }
+
+    private static string EnsureSqlitePathReady(string sqliteConnectionString)
+    {
+        var builder = new SqliteConnectionStringBuilder(sqliteConnectionString);
+        if (string.IsNullOrWhiteSpace(builder.DataSource) || builder.DataSource == ":memory:")
+        {
+            return sqliteConnectionString;
+        }
+
+        var fullPath = Path.GetFullPath(builder.DataSource);
+        var directory = Path.GetDirectoryName(fullPath);
+        if (!string.IsNullOrWhiteSpace(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        builder.DataSource = fullPath;
+        return builder.ToString();
     }
 
     private static async Task CopyTableAsync<TEntity>(
@@ -89,5 +113,21 @@ public static class SqliteProductionSync
 
         await target.Set<TEntity>().AddRangeAsync(rows);
         Console.WriteLine($"已同步 {typeof(TEntity).Name}：{rows.Count} 行");
+    }
+
+    private static async Task TryCopyTableIfExistsAsync<TEntity>(
+        ApplicationDbContext source,
+        ApplicationDbContext target
+    )
+        where TEntity : class
+    {
+        try
+        {
+            await CopyTableAsync<TEntity>(source, target);
+        }
+        catch (PostgresException ex) when (ex.SqlState == "42P01")
+        {
+            Console.WriteLine($"源库缺少表 {typeof(TEntity).Name}，已跳过。");
+        }
     }
 }

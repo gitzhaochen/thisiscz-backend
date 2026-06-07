@@ -47,6 +47,20 @@ dotnet run -- --sync-prod-to-sqlite
 This command reads from `POSTGRES_CONNECTIONSTRING` and rebuilds the SQLite file
 defined by `SQLITE_CONNECTIONSTRING`.
 
+## Import NZ school CSV data to local DB tables
+
+```bash
+dotnet run -- --import-nzschool-data
+```
+
+This command imports:
+- `docs/schooldirectory-07-06-2026-074525.csv` -> `schools`
+- `docs/10-Machine Readable-Roll by Funding year level ethnicity 2025.csv` -> `roll_ethnicity_fact`
+
+You can override paths via config:
+- `NzSchoolImport:SchoolDirectoryCsvPath`
+- `NzSchoolImport:RollCsvPath`
+
 ## Database Migrations
 
 ```bash

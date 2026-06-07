@@ -22,6 +22,13 @@ if (args.Contains("--sync-prod-to-sqlite", StringComparer.OrdinalIgnoreCase))
     return;
 }
 
+if (args.Contains("--import-nzschool-data", StringComparer.OrdinalIgnoreCase))
+{
+    var exitCode = await NzSchoolDataImportService.RunAsync(builder.Configuration);
+    Environment.ExitCode = exitCode;
+    return;
+}
+
 // Add services to the container.
 
 var allowedOrigins = builder.Configuration.GetValue<string>("allowedOrigins")!.Split(',');
