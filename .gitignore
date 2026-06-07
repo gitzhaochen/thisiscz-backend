@@ -10,3 +10,5 @@ out/
 ScaffoldingReadMe.txt
 *.log
 appsettings.Local.json
+data/*.db
+data/*.db-*
