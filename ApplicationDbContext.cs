@@ -93,6 +93,10 @@ public class ApplicationDbContext : IdentityDbContext
             .HasMaxLength(50)
             .IsRequired();
         modelBuilder.Entity<School>().Property(s => s.OrgType).HasMaxLength(100);
+        modelBuilder.Entity<School>().Property(s => s.CoEdStatus).HasMaxLength(50);
+        modelBuilder.Entity<School>().Property(s => s.Url).HasMaxLength(500);
+        modelBuilder.Entity<School>().Property(s => s.AddressLine1).HasMaxLength(200);
+        modelBuilder.Entity<School>().Property(s => s.AddressSuburb).HasMaxLength(100);
         modelBuilder.Entity<School>().Property(s => s.Status).HasMaxLength(50);
         modelBuilder.Entity<School>().Property(s => s.Region).HasMaxLength(100);
         modelBuilder.Entity<School>().Property(s => s.TerritorialAuthority).HasMaxLength(100);
@@ -127,7 +131,6 @@ public class ApplicationDbContext : IdentityDbContext
             .Property(r => r.Ethnicity)
             .HasMaxLength(50)
             .IsRequired();
-        modelBuilder.Entity<RollEthnicityFact>().Property(r => r.SourceFile).HasMaxLength(255);
         modelBuilder.Entity<RollEthnicityFact>().HasIndex(r => new { r.SchoolId, r.Year });
         modelBuilder
             .Entity<RollEthnicityFact>()

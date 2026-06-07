@@ -68,6 +68,14 @@ public static class NzSchoolDataImportService
                     AuthorityClass = MapAuthorityClass(GetValue(row, "Authority")),
                     LevelClass = MapLevelClass(GetValue(row, "Org_Type")),
                     OrgType = NullIfEmpty(GetValue(row, "Org_Type")),
+                    CoEdStatus = NullIfEmpty(GetValue(row, "CoEd_Status")),
+                    TotalStudents = TryGetInt(row, "Total", out var totalStudents)
+                        ? totalStudents
+                        : null,
+                    EqiIndex = TryGetInt(row, "EQi_Index", out var eqiIndex) ? eqiIndex : null,
+                    Url = NullIfEmpty(GetValue(row, "URL")),
+                    AddressLine1 = NullIfEmpty(GetValue(row, "Add1_Line1")),
+                    AddressSuburb = NullIfEmpty(GetValue(row, "Add1_Suburb")),
                     Status = NullIfEmpty(GetValue(row, "Status")),
                     Latitude = TryGetDouble(row, "Latitude", out var latitude) ? latitude : null,
                     Longitude = TryGetDouble(row, "Longitude", out var longitude) ? longitude : null,
@@ -134,7 +142,6 @@ public static class NzSchoolDataImportService
                     YearLevel = yearLevel,
                     Ethnicity = ethnicity,
                     StudentCount = studentCount,
-                    SourceFile = Path.GetFileName(rollCsvPath),
                     UpdatedAt = now,
                 }
             );

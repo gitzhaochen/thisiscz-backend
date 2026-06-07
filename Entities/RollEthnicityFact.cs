@@ -7,7 +7,6 @@ public class RollEthnicityFact
     public string YearLevel { get; set; } = string.Empty;
     public string Ethnicity { get; set; } = string.Empty;
     public int StudentCount { get; set; }
-    public string? SourceFile { get; set; }
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     public School School { get; set; } = null!;
