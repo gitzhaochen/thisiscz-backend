@@ -11,10 +11,10 @@ public static class NzSchoolDataImportService
     {
         var schoolCsvPath =
             configuration.GetValue<string>("NzSchoolImport:SchoolDirectoryCsvPath")
-            ?? "docs/schooldirectory-07-06-2026-074525.csv";
+            ?? "docs/csv/schooldirectory-07-06-2026-074525.csv";
         var rollCsvPath =
             configuration.GetValue<string>("NzSchoolImport:RollCsvPath")
-            ?? "docs/10-Machine Readable-Roll by Funding year level ethnicity 2025.csv";
+            ?? "docs/csv/10-Machine Readable-Roll by Funding year level ethnicity 2025.csv";
 
         if (!File.Exists(schoolCsvPath))
         {
@@ -31,7 +31,9 @@ public static class NzSchoolDataImportService
         var databaseProvider =
             configuration.GetValue<string>("DatabaseProvider")?.Trim().ToLowerInvariant()
             ?? "postgres";
-        var postgresConnectionString = configuration.GetConnectionString("POSTGRES_CONNECTIONSTRING");
+        var postgresConnectionString = configuration.GetConnectionString(
+            "POSTGRES_CONNECTIONSTRING"
+        );
         var sqliteConnectionString = configuration.GetConnectionString("SQLITE_CONNECTIONSTRING");
 
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
@@ -78,20 +80,21 @@ public static class NzSchoolDataImportService
                     AddressSuburb = NullIfEmpty(GetValue(row, "Add1_Suburb")),
                     Status = NullIfEmpty(GetValue(row, "Status")),
                     Latitude = TryGetDouble(row, "Latitude", out var latitude) ? latitude : null,
-                    Longitude = TryGetDouble(row, "Longitude", out var longitude) ? longitude : null,
+                    Longitude = TryGetDouble(row, "Longitude", out var longitude)
+                        ? longitude
+                        : null,
                     Region = NullIfEmpty(GetValue(row, "Education_Region")),
                     TerritorialAuthority = NullIfEmpty(GetValue(row, "Territorial_Authority")),
-                    City = NullIfEmpty(GetValue(row, "Add1_City")) ?? NullIfEmpty(GetValue(row, "Add2_City")),
+                    City =
+                        NullIfEmpty(GetValue(row, "Add1_City"))
+                        ?? NullIfEmpty(GetValue(row, "Add2_City")),
                     UpdatedAt = now,
                 }
             );
         }
 
         // 去重，防止源数据重复导致唯一索引冲突。
-        schools = schools
-            .GroupBy(s => s.SchoolId)
-            .Select(g => g.First())
-            .ToList();
+        schools = schools.GroupBy(s => s.SchoolId).Select(g => g.First()).ToList();
         var validSchoolIds = schools.Select(s => s.SchoolId).ToHashSet();
 
         var rollRows = ReadCsvRows(rollCsvPath);
@@ -175,7 +178,9 @@ public static class NzSchoolDataImportService
             return new();
         }
 
-        var headers = (parser.ReadFields() ?? Array.Empty<string>()).Select(h => h.Trim()).ToArray();
+        var headers = (parser.ReadFields() ?? Array.Empty<string>())
+            .Select(h => h.Trim())
+            .ToArray();
         var rows = new List<Dictionary<string, string>>();
 
         while (!parser.EndOfData)
@@ -209,7 +214,11 @@ public static class NzSchoolDataImportService
         return string.IsNullOrWhiteSpace(value) ? null : value;
     }
 
-    private static bool TryGetInt(IReadOnlyDictionary<string, string> row, string key, out int value)
+    private static bool TryGetInt(
+        IReadOnlyDictionary<string, string> row,
+        string key,
+        out int value
+    )
     {
         return int.TryParse(
             GetValue(row, key),
@@ -219,7 +228,11 @@ public static class NzSchoolDataImportService
         );
     }
 
-    private static bool TryGetDouble(IReadOnlyDictionary<string, string> row, string key, out double value)
+    private static bool TryGetDouble(
+        IReadOnlyDictionary<string, string> row,
+        string key,
+        out double value
+    )
     {
         return double.TryParse(
             GetValue(row, key),
