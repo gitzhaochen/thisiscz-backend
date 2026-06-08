@@ -12,3 +12,4 @@ ScaffoldingReadMe.txt
 appsettings.Local.json
 data/*.db
 data/*.db-*
+docs/csv
