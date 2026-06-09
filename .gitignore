@@ -9,6 +9,7 @@ out/
 .idea/
 ScaffoldingReadMe.txt
 *.log
+.DS_Store
 appsettings.Local.json
 data/*.db
 data/*.db-*
