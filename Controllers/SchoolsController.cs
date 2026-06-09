@@ -22,12 +22,15 @@ public class SchoolsController : ControllerBase
     [OutputCache(Tags = [CacheKey])]
     public async Task<ActionResult<SchoolFilterOptionsDTO>> GetEnums()
     {
-        var region = await context
+        var city = await context
             .Schools.AsNoTracking()
-            .Where(s => !string.IsNullOrWhiteSpace(s.Region))
-            .Select(s => s.Region!)
-            .Distinct()
-            .OrderBy(x => x)
+            .Where(s => !string.IsNullOrWhiteSpace(s.City))
+            .GroupBy(s => s.City!)
+            .Select(g => new { City = g.Key, SchoolCount = g.Count() })
+            .OrderByDescending(x => x.SchoolCount)
+            .ThenBy(x => x.City)
+            .Take(10)
+            .Select(x => x.City)
             .ToListAsync();
 
         var authorityClass = await context
@@ -38,10 +41,10 @@ public class SchoolsController : ControllerBase
             .OrderBy(x => x)
             .ToListAsync();
 
-        var orgType = await context
+        var levelClass = await context
             .Schools.AsNoTracking()
-            .Where(s => !string.IsNullOrWhiteSpace(s.OrgType))
-            .Select(s => s.OrgType!)
+            .Where(s => !string.IsNullOrWhiteSpace(s.LevelClass))
+            .Select(s => s.LevelClass)
             .Distinct()
             .OrderBy(x => x)
             .ToListAsync();
@@ -56,9 +59,9 @@ public class SchoolsController : ControllerBase
 
         return new SchoolFilterOptionsDTO
         {
-            Region = region,
+            City = city,
             AuthorityClass = authorityClass,
-            OrgType = orgType,
+            LevelClass = levelClass,
             CoEdStatus = coEdStatus,
         };
     }
@@ -144,10 +147,10 @@ public class SchoolsController : ControllerBase
             queryable = queryable.Where(s => s.Name.ToLower().Contains(keyword));
         }
 
-        if (!string.IsNullOrWhiteSpace(query.Region))
+        if (!string.IsNullOrWhiteSpace(query.City))
         {
-            var region = query.Region.Trim().ToLowerInvariant();
-            queryable = queryable.Where(s => s.Region != null && s.Region.ToLower() == region);
+            var city = query.City.Trim().ToLowerInvariant();
+            queryable = queryable.Where(s => s.City != null && s.City.ToLower() == city);
         }
 
         if (!string.IsNullOrWhiteSpace(query.AuthorityClass))
@@ -166,12 +169,10 @@ public class SchoolsController : ControllerBase
             );
         }
 
-        var normalizedOrgTypes = NormalizeOrgTypes(query.OrgType);
-        if (normalizedOrgTypes.Count > 0)
+        if (!string.IsNullOrWhiteSpace(query.LevelClass))
         {
-            queryable = queryable.Where(s =>
-                s.OrgType != null && normalizedOrgTypes.Contains(s.OrgType.ToLower())
-            );
+            var levelClass = query.LevelClass.Trim().ToLowerInvariant();
+            queryable = queryable.Where(s => s.LevelClass.ToLower() == levelClass);
         }
 
         var sortOrder = query.EqiIndexSortOrder.Trim().ToLowerInvariant();
@@ -224,34 +225,6 @@ public class SchoolsController : ControllerBase
             TotalCount = totalCount,
             Items = items,
         };
-    }
-
-    private static HashSet<string> NormalizeOrgTypes(IEnumerable<string>? rawOrgTypes)
-    {
-        var normalized = new HashSet<string>(StringComparer.Ordinal);
-        if (rawOrgTypes is null)
-        {
-            return normalized;
-        }
-
-        foreach (var item in rawOrgTypes)
-        {
-            if (string.IsNullOrWhiteSpace(item))
-            {
-                continue;
-            }
-
-            foreach (var split in item.Split(',', StringSplitOptions.RemoveEmptyEntries))
-            {
-                var value = split.Trim().ToLowerInvariant();
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    normalized.Add(value);
-                }
-            }
-        }
-
-        return normalized;
     }
 
     private static int ParseYearLevelOrder(string? yearLevel)
