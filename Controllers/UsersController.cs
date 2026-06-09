@@ -306,8 +306,7 @@ public class UsersController : ControllerBase
                 }
 
                 // 用户创建成功后，再添加 Claim
-                var role = payload.Email.Contains("zcnftweb@gmail.com") ? "admin" : "user";
-                await userManager.AddClaimAsync(user, new Claim(RoleClaimType, role));
+                await userManager.AddClaimAsync(user, new Claim(RoleClaimType, "user"));
             }
 
             return await BuildAccessTokenAsync(user);
