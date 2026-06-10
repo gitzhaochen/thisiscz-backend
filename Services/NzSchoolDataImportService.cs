@@ -260,11 +260,12 @@ public static class NzSchoolDataImportService
     {
         var value = orgType.Trim().ToLowerInvariant();
 
-        if (
-            value.Contains("full primary")
-            || value.Contains("contributing")
-            || value.Contains("intermediate")
-        )
+        if (value.Contains("intermediate"))
+        {
+            return "intermediate";
+        }
+
+        if (value.Contains("full primary") || value.Contains("contributing"))
         {
             return "primary";
         }

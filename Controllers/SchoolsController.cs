@@ -12,6 +12,15 @@ public class SchoolsController : ControllerBase
 {
     private readonly ApplicationDbContext context;
     private const string CacheKey = "schools";
+    private static readonly string[] KnownLevelClassOrder =
+    [
+        "primary",
+        "intermediate",
+        "secondary",
+        "composite",
+        "specialist",
+        "other",
+    ];
 
     public SchoolsController(ApplicationDbContext context)
     {
@@ -41,13 +50,18 @@ public class SchoolsController : ControllerBase
             .OrderBy(x => x)
             .ToListAsync();
 
-        var levelClass = await context
+        var dbLevelClass = await context
             .Schools.AsNoTracking()
             .Where(s => !string.IsNullOrWhiteSpace(s.LevelClass))
-            .Select(s => s.LevelClass)
+            .Select(s => s.LevelClass.Trim().ToLower())
             .Distinct()
             .OrderBy(x => x)
             .ToListAsync();
+        var knownLevelClassSet = KnownLevelClassOrder.ToHashSet(StringComparer.Ordinal);
+        var levelClass = KnownLevelClassOrder
+            .Concat(dbLevelClass.Where(x => !knownLevelClassSet.Contains(x)))
+            .Distinct()
+            .ToList();
 
         var coEdStatus = await context
             .Schools.AsNoTracking()
