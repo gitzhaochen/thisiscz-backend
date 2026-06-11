@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 using ThisisczApi.DTOs;
+using ThisisczApi.Entities;
+using ThisisczApi.Services;
 using ThisisczApi.Utilities;
 
 namespace ThisisczApi.Controllers;
@@ -84,53 +86,46 @@ public class SchoolsController : ControllerBase
     [OutputCache(Tags = [CacheKey])]
     public async Task<ActionResult<SchoolDetailDTO>> GetDetail(int schoolId)
     {
-        var school = await context
+        const int tertiaryYear = NzSchoolTertiaryProgressionImportService.DefaultYear;
+
+        var row = await context
             .Schools.AsNoTracking()
             .Where(s => s.SchoolId == schoolId)
-            .Select(s => new SchoolDetailDTO
+            .Select(s => new
             {
-                Id = s.Id,
-                SchoolId = s.SchoolId,
-                Name = s.Name,
-                AuthorityClass = s.AuthorityClass,
-                LevelClass = s.LevelClass,
-                OrgType = s.OrgType,
-                CoEdStatus = s.CoEdStatus,
-                TotalStudents = s.TotalStudents,
-                EqiIndex = s.EqiIndex,
-                Url = s.Url,
-                AddressLine1 = s.AddressLine1,
-                AddressSuburb = s.AddressSuburb,
-                Status = s.Status,
-                Latitude = s.Latitude,
-                Longitude = s.Longitude,
-                Region = s.Region,
-                TerritorialAuthority = s.TerritorialAuthority,
-                City = s.City,
-                TotalLeavers2023 = s.TotalLeavers2023,
-                TotalUniversity2023 = s.TotalUniversity2023,
-                AsianUniversity2023 = s.AsianUniversity2023,
-                EuropeanPakehaUniversity2023 = s.EuropeanPakehaUniversity2023,
-                MaoriUniversity2023 = s.MaoriUniversity2023,
-                PacificUniversity2023 = s.PacificUniversity2023,
-                MelaaUniversity2023 = s.MelaaUniversity2023,
-                OtherUniversity2023 = s.OtherUniversity2023,
-                InternationalFeePayingUniversity2023 = s.InternationalFeePayingUniversity2023,
-                AsianTotalLeavers2023 = s.AsianTotalLeavers2023,
-                EuropeanPakehaTotalLeavers2023 = s.EuropeanPakehaTotalLeavers2023,
-                MaoriTotalLeavers2023 = s.MaoriTotalLeavers2023,
-                PacificTotalLeavers2023 = s.PacificTotalLeavers2023,
-                MelaaTotalLeavers2023 = s.MelaaTotalLeavers2023,
-                OtherTotalLeavers2023 = s.OtherTotalLeavers2023,
-                InternationalFeePayingTotalLeavers2023 = s.InternationalFeePayingTotalLeavers2023,
-                UeRate = s.UeRate,
+                Detail = new SchoolDetailDTO
+                {
+                    Id = s.Id,
+                    SchoolId = s.SchoolId,
+                    Name = s.Name,
+                    AuthorityClass = s.AuthorityClass,
+                    LevelClass = s.LevelClass,
+                    OrgType = s.OrgType,
+                    CoEdStatus = s.CoEdStatus,
+                    TotalStudents = s.TotalStudents,
+                    EqiIndex = s.EqiIndex,
+                    Url = s.Url,
+                    AddressLine1 = s.AddressLine1,
+                    AddressSuburb = s.AddressSuburb,
+                    Status = s.Status,
+                    Latitude = s.Latitude,
+                    Longitude = s.Longitude,
+                    Region = s.Region,
+                    TerritorialAuthority = s.TerritorialAuthority,
+                    City = s.City,
+                    UeRate = s.UeRate,
+                },
+                Progression = s.TertiaryProgressions.FirstOrDefault(p => p.Year == tertiaryYear),
             })
             .FirstOrDefaultAsync();
 
-        if (school is null)
+        if (row is null)
         {
             return NotFound();
         }
+
+        var school = row.Detail;
+        ApplyTertiaryProgression2023(school, row.Progression);
 
         const int targetYear = 2025;
 
@@ -275,6 +270,35 @@ public class SchoolsController : ControllerBase
             TotalCount = totalCount,
             Items = items,
         };
+    }
+
+    private static void ApplyTertiaryProgression2023(
+        SchoolDetailDTO detail,
+        SchoolTertiaryProgression? progression
+    )
+    {
+        if (progression is null)
+        {
+            return;
+        }
+
+        detail.TotalLeavers2023 = progression.TotalLeavers;
+        detail.TotalUniversity2023 = progression.TotalUniversity;
+        detail.AsianUniversity2023 = progression.AsianUniversity;
+        detail.EuropeanPakehaUniversity2023 = progression.EuropeanPakehaUniversity;
+        detail.MaoriUniversity2023 = progression.MaoriUniversity;
+        detail.PacificUniversity2023 = progression.PacificUniversity;
+        detail.MelaaUniversity2023 = progression.MelaaUniversity;
+        detail.OtherUniversity2023 = progression.OtherUniversity;
+        detail.InternationalFeePayingUniversity2023 = progression.InternationalFeePayingUniversity;
+        detail.AsianTotalLeavers2023 = progression.AsianTotalLeavers;
+        detail.EuropeanPakehaTotalLeavers2023 = progression.EuropeanPakehaTotalLeavers;
+        detail.MaoriTotalLeavers2023 = progression.MaoriTotalLeavers;
+        detail.PacificTotalLeavers2023 = progression.PacificTotalLeavers;
+        detail.MelaaTotalLeavers2023 = progression.MelaaTotalLeavers;
+        detail.OtherTotalLeavers2023 = progression.OtherTotalLeavers;
+        detail.InternationalFeePayingTotalLeavers2023 =
+            progression.InternationalFeePayingTotalLeavers;
     }
 
     private static int ParseYearLevelOrder(string? yearLevel)

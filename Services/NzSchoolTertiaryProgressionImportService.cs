@@ -1,11 +1,14 @@
 using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic.FileIO;
+using ThisisczApi.Entities;
 
 namespace ThisisczApi.Services;
 
 public static class NzSchoolTertiaryProgressionImportService
 {
+    public const int DefaultYear = 2023;
+
     public static async Task<int> RunAsync(IConfiguration configuration)
     {
         var csvPath =
@@ -65,6 +68,12 @@ public static class NzSchoolTertiaryProgressionImportService
             .Schools.Where(s => schoolIds.Contains(s.SchoolId))
             .ToDictionaryAsync(s => s.SchoolId);
 
+        var progressions = await db
+            .SchoolTertiaryProgressions.Where(p =>
+                schoolIds.Contains(p.SchoolId) && p.Year == DefaultYear
+            )
+            .ToDictionaryAsync(p => p.SchoolId);
+
         var now = DateTime.UtcNow;
         var updated = 0;
         var skippedMissingSchool = 0;
@@ -82,38 +91,52 @@ public static class NzSchoolTertiaryProgressionImportService
                 continue;
             }
 
+            if (!progressions.TryGetValue(schoolId, out var progression))
+            {
+                progression = new SchoolTertiaryProgression
+                {
+                    SchoolId = schoolId,
+                    Year = DefaultYear,
+                };
+                db.SchoolTertiaryProgressions.Add(progression);
+                progressions[schoolId] = progression;
+            }
+
             var totalLeavers = TryGetNullableInt(row, "total_leavers");
             var totalUniversity = TryGetNullableInt(row, "total_university");
 
-            school.TotalLeavers2023 = totalLeavers;
-            school.TotalUniversity2023 = totalUniversity;
-            school.AsianUniversity2023 = TryGetNullableInt(row, "asian_university");
-            school.EuropeanPakehaUniversity2023 = TryGetNullableInt(
+            progression.TotalLeavers = totalLeavers;
+            progression.TotalUniversity = totalUniversity;
+            progression.AsianUniversity = TryGetNullableInt(row, "asian_university");
+            progression.EuropeanPakehaUniversity = TryGetNullableInt(
                 row,
                 "european_pakeha_university"
             );
-            school.MaoriUniversity2023 = TryGetNullableInt(row, "maori_university");
-            school.PacificUniversity2023 = TryGetNullableInt(row, "pacific_university");
-            school.MelaaUniversity2023 = TryGetNullableInt(row, "melaa_university");
-            school.OtherUniversity2023 = TryGetNullableInt(row, "other_university");
-            school.InternationalFeePayingUniversity2023 = TryGetNullableInt(
+            progression.MaoriUniversity = TryGetNullableInt(row, "maori_university");
+            progression.PacificUniversity = TryGetNullableInt(row, "pacific_university");
+            progression.MelaaUniversity = TryGetNullableInt(row, "melaa_university");
+            progression.OtherUniversity = TryGetNullableInt(row, "other_university");
+            progression.InternationalFeePayingUniversity = TryGetNullableInt(
                 row,
                 "international_fee_paying_university"
             );
-            school.AsianTotalLeavers2023 = TryGetNullableInt(row, "asian_total_leavers");
-            school.EuropeanPakehaTotalLeavers2023 = TryGetNullableInt(
+            progression.AsianTotalLeavers = TryGetNullableInt(row, "asian_total_leavers");
+            progression.EuropeanPakehaTotalLeavers = TryGetNullableInt(
                 row,
                 "european_pakeha_total_leavers"
             );
-            school.MaoriTotalLeavers2023 = TryGetNullableInt(row, "maori_total_leavers");
-            school.PacificTotalLeavers2023 = TryGetNullableInt(row, "pacific_total_leavers");
-            school.MelaaTotalLeavers2023 = TryGetNullableInt(row, "melaa_total_leavers");
-            school.OtherTotalLeavers2023 = TryGetNullableInt(row, "other_total_leavers");
-            school.InternationalFeePayingTotalLeavers2023 = TryGetNullableInt(
+            progression.MaoriTotalLeavers = TryGetNullableInt(row, "maori_total_leavers");
+            progression.PacificTotalLeavers = TryGetNullableInt(row, "pacific_total_leavers");
+            progression.MelaaTotalLeavers = TryGetNullableInt(row, "melaa_total_leavers");
+            progression.OtherTotalLeavers = TryGetNullableInt(row, "other_total_leavers");
+            progression.InternationalFeePayingTotalLeavers = TryGetNullableInt(
                 row,
                 "international_fee_paying_total_leavers"
             );
-            school.UeRate = CalculateUeRate(totalUniversity, totalLeavers);
+            progression.UeRate = CalculateUeRate(totalUniversity, totalLeavers);
+            progression.UpdatedAt = now;
+
+            school.UeRate = progression.UeRate;
             school.UpdatedAt = now;
             updated++;
         }

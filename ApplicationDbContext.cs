@@ -17,6 +17,7 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Link> Links { get; set; }
     public DbSet<School> Schools { get; set; }
     public DbSet<RollEthnicityFact> RollEthnicityFacts { get; set; }
+    public DbSet<SchoolTertiaryProgression> SchoolTertiaryProgressions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -137,6 +138,19 @@ public class ApplicationDbContext : IdentityDbContext
             .HasOne(r => r.School)
             .WithMany(s => s.RollEthnicityFacts)
             .HasForeignKey(r => r.SchoolId)
+            .HasPrincipalKey(s => s.SchoolId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<SchoolTertiaryProgression>().ToTable("school_tertiary_progression");
+        modelBuilder
+            .Entity<SchoolTertiaryProgression>()
+            .HasKey(p => new { p.SchoolId, p.Year });
+        modelBuilder.Entity<SchoolTertiaryProgression>().HasIndex(p => p.Year);
+        modelBuilder
+            .Entity<SchoolTertiaryProgression>()
+            .HasOne(p => p.School)
+            .WithMany(s => s.TertiaryProgressions)
+            .HasForeignKey(p => p.SchoolId)
             .HasPrincipalKey(s => s.SchoolId)
             .OnDelete(DeleteBehavior.Cascade);
 
