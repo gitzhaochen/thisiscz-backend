@@ -116,6 +116,13 @@ public class SchoolsController : ControllerBase
                 MelaaUniversity2023 = s.MelaaUniversity2023,
                 OtherUniversity2023 = s.OtherUniversity2023,
                 InternationalFeePayingUniversity2023 = s.InternationalFeePayingUniversity2023,
+                AsianTotalLeavers2023 = s.AsianTotalLeavers2023,
+                EuropeanPakehaTotalLeavers2023 = s.EuropeanPakehaTotalLeavers2023,
+                MaoriTotalLeavers2023 = s.MaoriTotalLeavers2023,
+                PacificTotalLeavers2023 = s.PacificTotalLeavers2023,
+                MelaaTotalLeavers2023 = s.MelaaTotalLeavers2023,
+                OtherTotalLeavers2023 = s.OtherTotalLeavers2023,
+                InternationalFeePayingTotalLeavers2023 = s.InternationalFeePayingTotalLeavers2023,
                 UeRate = s.UeRate,
             })
             .FirstOrDefaultAsync();
@@ -266,6 +273,13 @@ public class SchoolsController : ControllerBase
                 MelaaUniversity2023 = s.MelaaUniversity2023,
                 OtherUniversity2023 = s.OtherUniversity2023,
                 InternationalFeePayingUniversity2023 = s.InternationalFeePayingUniversity2023,
+                AsianTotalLeavers2023 = s.AsianTotalLeavers2023,
+                EuropeanPakehaTotalLeavers2023 = s.EuropeanPakehaTotalLeavers2023,
+                MaoriTotalLeavers2023 = s.MaoriTotalLeavers2023,
+                PacificTotalLeavers2023 = s.PacificTotalLeavers2023,
+                MelaaTotalLeavers2023 = s.MelaaTotalLeavers2023,
+                OtherTotalLeavers2023 = s.OtherTotalLeavers2023,
+                InternationalFeePayingTotalLeavers2023 = s.InternationalFeePayingTotalLeavers2023,
                 UeRate = s.UeRate,
             })
             .ToListAsync();

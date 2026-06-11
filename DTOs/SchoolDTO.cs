@@ -29,5 +29,12 @@ public class SchoolDTO
     public int? MelaaUniversity2023 { get; set; }
     public int? OtherUniversity2023 { get; set; }
     public int? InternationalFeePayingUniversity2023 { get; set; }
+    public int? AsianTotalLeavers2023 { get; set; }
+    public int? EuropeanPakehaTotalLeavers2023 { get; set; }
+    public int? MaoriTotalLeavers2023 { get; set; }
+    public int? PacificTotalLeavers2023 { get; set; }
+    public int? MelaaTotalLeavers2023 { get; set; }
+    public int? OtherTotalLeavers2023 { get; set; }
+    public int? InternationalFeePayingTotalLeavers2023 { get; set; }
     public double? UeRate { get; set; }
 }

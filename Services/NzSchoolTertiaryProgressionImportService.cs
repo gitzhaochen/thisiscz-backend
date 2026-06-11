@@ -100,6 +100,19 @@ public static class NzSchoolTertiaryProgressionImportService
                 row,
                 "international_fee_paying_university"
             );
+            school.AsianTotalLeavers2023 = TryGetNullableInt(row, "asian_total_leavers");
+            school.EuropeanPakehaTotalLeavers2023 = TryGetNullableInt(
+                row,
+                "european_pakeha_total_leavers"
+            );
+            school.MaoriTotalLeavers2023 = TryGetNullableInt(row, "maori_total_leavers");
+            school.PacificTotalLeavers2023 = TryGetNullableInt(row, "pacific_total_leavers");
+            school.MelaaTotalLeavers2023 = TryGetNullableInt(row, "melaa_total_leavers");
+            school.OtherTotalLeavers2023 = TryGetNullableInt(row, "other_total_leavers");
+            school.InternationalFeePayingTotalLeavers2023 = TryGetNullableInt(
+                row,
+                "international_fee_paying_total_leavers"
+            );
             school.UeRate = CalculateUeRate(totalUniversity, totalLeavers);
             school.UpdatedAt = now;
             updated++;

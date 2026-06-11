@@ -17,9 +17,10 @@ namespace ThisisczApi.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                 .HasAnnotation("ProductVersion", "9.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -51,8 +52,9 @@ namespace ThisisczApi.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("text");
@@ -139,8 +141,9 @@ namespace ThisisczApi.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("text");
@@ -219,8 +222,9 @@ namespace ThisisczApi.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -254,15 +258,16 @@ namespace ThisisczApi.Migrations
                     b.HasIndex("PostId", "ParentId")
                         .HasDatabaseName("IX_Comments_PostId_ParentId");
 
-                    b.ToTable("Comments", (string)null);
+                    b.ToTable("Comments");
                 });
 
             modelBuilder.Entity("ThisisczApi.Entities.Link", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Category")
                         .HasColumnType("integer");
@@ -303,15 +308,16 @@ namespace ThisisczApi.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Links", (string)null);
+                    b.ToTable("Links");
                 });
 
             modelBuilder.Entity("ThisisczApi.Entities.Post", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AuthorId")
                         .IsRequired()
@@ -355,15 +361,16 @@ namespace ThisisczApi.Migrations
                     b.HasIndex("CreatedAt")
                         .HasDatabaseName("IX_Posts_CreatedAt");
 
-                    b.ToTable("Posts", (string)null);
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("ThisisczApi.Entities.PostLike", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -382,15 +389,16 @@ namespace ThisisczApi.Migrations
                     b.HasIndex("PostId", "UserId")
                         .IsUnique();
 
-                    b.ToTable("PostLikes", (string)null);
+                    b.ToTable("PostLikes");
                 });
 
             modelBuilder.Entity("ThisisczApi.Entities.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
@@ -420,7 +428,7 @@ namespace ThisisczApi.Migrations
                     b.HasIndex("UserId")
                         .HasDatabaseName("IX_RefreshTokens_UserId");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("ThisisczApi.Entities.RollEthnicityFact", b =>
@@ -456,8 +464,9 @@ namespace ThisisczApi.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AddressLine1")
                         .HasMaxLength(200)
@@ -466,6 +475,9 @@ namespace ThisisczApi.Migrations
                     b.Property<string>("AddressSuburb")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<int?>("AsianTotalLeavers2023")
+                        .HasColumnType("integer");
 
                     b.Property<int?>("AsianUniversity2023")
                         .HasColumnType("integer");
@@ -486,7 +498,13 @@ namespace ThisisczApi.Migrations
                     b.Property<int?>("EqiIndex")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("EuropeanPakehaTotalLeavers2023")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("EuropeanPakehaUniversity2023")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("InternationalFeePayingTotalLeavers2023")
                         .HasColumnType("integer");
 
                     b.Property<int?>("InternationalFeePayingUniversity2023")
@@ -503,7 +521,13 @@ namespace ThisisczApi.Migrations
                     b.Property<double?>("Longitude")
                         .HasColumnType("double precision");
 
+                    b.Property<int?>("MaoriTotalLeavers2023")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("MaoriUniversity2023")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("MelaaTotalLeavers2023")
                         .HasColumnType("integer");
 
                     b.Property<int?>("MelaaUniversity2023")
@@ -518,7 +542,13 @@ namespace ThisisczApi.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<int?>("OtherTotalLeavers2023")
+                        .HasColumnType("integer");
+
                     b.Property<int?>("OtherUniversity2023")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PacificTotalLeavers2023")
                         .HasColumnType("integer");
 
                     b.Property<int?>("PacificUniversity2023")
