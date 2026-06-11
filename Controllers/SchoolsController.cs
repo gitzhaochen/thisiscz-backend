@@ -107,6 +107,16 @@ public class SchoolsController : ControllerBase
                 Region = s.Region,
                 TerritorialAuthority = s.TerritorialAuthority,
                 City = s.City,
+                TotalLeavers2023 = s.TotalLeavers2023,
+                TotalUniversity2023 = s.TotalUniversity2023,
+                AsianUniversity2023 = s.AsianUniversity2023,
+                EuropeanPakehaUniversity2023 = s.EuropeanPakehaUniversity2023,
+                MaoriUniversity2023 = s.MaoriUniversity2023,
+                PacificUniversity2023 = s.PacificUniversity2023,
+                MelaaUniversity2023 = s.MelaaUniversity2023,
+                OtherUniversity2023 = s.OtherUniversity2023,
+                InternationalFeePayingUniversity2023 = s.InternationalFeePayingUniversity2023,
+                UeRate = s.UeRate,
             })
             .FirstOrDefaultAsync();
 
@@ -135,8 +145,7 @@ public class SchoolsController : ControllerBase
             .Select(g => new SchoolYearLevelEthnicityDTO
             {
                 YearLevel = g.Key,
-                EthnicityCounts = g
-                    .OrderBy(x => x.Ethnicity)
+                EthnicityCounts = g.OrderBy(x => x.Ethnicity)
                     .Select(x => new SchoolEthnicityCountDTO
                     {
                         Ethnicity = x.Ethnicity,
@@ -151,7 +160,9 @@ public class SchoolsController : ControllerBase
 
     [HttpGet]
     [OutputCache(Tags = [CacheKey])]
-    public async Task<ActionResult<PaginationResult<SchoolDTO>>> GetList([FromQuery] SchoolQueryDTO query)
+    public async Task<ActionResult<PaginationResult<SchoolDTO>>> GetList(
+        [FromQuery] SchoolQueryDTO query
+    )
     {
         var queryable = context.Schools.AsNoTracking().AsQueryable();
 
@@ -189,17 +200,34 @@ public class SchoolsController : ControllerBase
             queryable = queryable.Where(s => s.LevelClass.ToLower() == levelClass);
         }
 
-        var sortOrder = query.EqiIndexSortOrder.Trim().ToLowerInvariant();
-        var desc = sortOrder == "desc";
-        queryable = desc
-            ? queryable
-                .OrderByDescending(s => s.EqiIndex == null ? 1 : 0)
-                .ThenByDescending(s => s.EqiIndex)
-                .ThenBy(s => s.Id)
-            : queryable
-                .OrderBy(s => s.EqiIndex == null ? 1 : 0)
-                .ThenBy(s => s.EqiIndex)
-                .ThenBy(s => s.Id);
+        var ueRateSortOrder = query.UeRateSortOrder?.Trim().ToLowerInvariant();
+        if (!string.IsNullOrWhiteSpace(ueRateSortOrder))
+        {
+            var ueDesc = ueRateSortOrder == "desc";
+            queryable = ueDesc
+                ? queryable
+                    .OrderBy(s => s.UeRate == null ? 1 : 0)
+                    .ThenByDescending(s => s.UeRate)
+                    .ThenBy(s => s.Id)
+                : queryable
+                    .OrderBy(s => s.UeRate == null ? 1 : 0)
+                    .ThenBy(s => s.UeRate)
+                    .ThenBy(s => s.Id);
+        }
+        else
+        {
+            var sortOrder = query.EqiIndexSortOrder.Trim().ToLowerInvariant();
+            var desc = sortOrder == "desc";
+            queryable = desc
+                ? queryable
+                    .OrderBy(s => s.EqiIndex == null ? 1 : 0)
+                    .ThenByDescending(s => s.EqiIndex)
+                    .ThenBy(s => s.Id)
+                : queryable
+                    .OrderBy(s => s.EqiIndex == null ? 1 : 0)
+                    .ThenBy(s => s.EqiIndex)
+                    .ThenBy(s => s.Id);
+        }
 
         var totalCount = await queryable.CountAsync();
 
@@ -229,6 +257,16 @@ public class SchoolsController : ControllerBase
                 Region = s.Region,
                 TerritorialAuthority = s.TerritorialAuthority,
                 City = s.City,
+                TotalLeavers2023 = s.TotalLeavers2023,
+                TotalUniversity2023 = s.TotalUniversity2023,
+                AsianUniversity2023 = s.AsianUniversity2023,
+                EuropeanPakehaUniversity2023 = s.EuropeanPakehaUniversity2023,
+                MaoriUniversity2023 = s.MaoriUniversity2023,
+                PacificUniversity2023 = s.PacificUniversity2023,
+                MelaaUniversity2023 = s.MelaaUniversity2023,
+                OtherUniversity2023 = s.OtherUniversity2023,
+                InternationalFeePayingUniversity2023 = s.InternationalFeePayingUniversity2023,
+                UeRate = s.UeRate,
             })
             .ToListAsync();
 

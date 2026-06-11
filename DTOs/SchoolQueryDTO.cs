@@ -8,4 +8,5 @@ public class SchoolQueryDTO : PaginationDTO
     public string? LevelClass { get; set; }
     public string? CoEdStatus { get; set; }
     public string EqiIndexSortOrder { get; set; } = "asc";
+    public string? UeRateSortOrder { get; set; }
 }
