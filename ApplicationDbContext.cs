@@ -78,21 +78,9 @@ public class ApplicationDbContext : IdentityDbContext
         modelBuilder.Entity<School>().ToTable("schools");
         modelBuilder.Entity<School>().HasKey(s => s.Id);
         modelBuilder.Entity<School>().HasIndex(s => s.SchoolId).IsUnique();
-        modelBuilder
-            .Entity<School>()
-            .Property(s => s.Name)
-            .HasMaxLength(200)
-            .IsRequired();
-        modelBuilder
-            .Entity<School>()
-            .Property(s => s.AuthorityClass)
-            .HasMaxLength(50)
-            .IsRequired();
-        modelBuilder
-            .Entity<School>()
-            .Property(s => s.LevelClass)
-            .HasMaxLength(50)
-            .IsRequired();
+        modelBuilder.Entity<School>().Property(s => s.Name).HasMaxLength(200).IsRequired();
+        modelBuilder.Entity<School>().Property(s => s.AuthorityClass).HasMaxLength(50).IsRequired();
+        modelBuilder.Entity<School>().Property(s => s.LevelClass).HasMaxLength(50).IsRequired();
         modelBuilder.Entity<School>().Property(s => s.OrgType).HasMaxLength(100);
         modelBuilder.Entity<School>().Property(s => s.CoEdStatus).HasMaxLength(50);
         modelBuilder.Entity<School>().Property(s => s.Url).HasMaxLength(500);
@@ -142,9 +130,7 @@ public class ApplicationDbContext : IdentityDbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<SchoolTertiaryProgression>().ToTable("school_tertiary_progression");
-        modelBuilder
-            .Entity<SchoolTertiaryProgression>()
-            .HasKey(p => new { p.SchoolId, p.Year });
+        modelBuilder.Entity<SchoolTertiaryProgression>().HasKey(p => new { p.SchoolId, p.Year });
         modelBuilder.Entity<SchoolTertiaryProgression>().HasIndex(p => p.Year);
         modelBuilder
             .Entity<SchoolTertiaryProgression>()

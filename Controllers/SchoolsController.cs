@@ -1,3 +1,5 @@
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +15,7 @@ namespace ThisisczApi.Controllers;
 public class SchoolsController : ControllerBase
 {
     private readonly ApplicationDbContext context;
+    private readonly IMapper mapper;
     private const string CacheKey = "schools";
     private static readonly string[] KnownLevelClassOrder =
     [
@@ -24,9 +27,10 @@ public class SchoolsController : ControllerBase
         "other",
     ];
 
-    public SchoolsController(ApplicationDbContext context)
+    public SchoolsController(ApplicationDbContext context, IMapper mapper)
     {
         this.context = context;
+        this.mapper = mapper;
     }
 
     [HttpGet("enums")]
@@ -88,44 +92,21 @@ public class SchoolsController : ControllerBase
     {
         const int tertiaryYear = NzSchoolTertiaryProgressionImportService.DefaultYear;
 
-        var row = await context
+        var school = await context
             .Schools.AsNoTracking()
             .Where(s => s.SchoolId == schoolId)
-            .Select(s => new
-            {
-                Detail = new SchoolDetailDTO
-                {
-                    Id = s.Id,
-                    SchoolId = s.SchoolId,
-                    Name = s.Name,
-                    AuthorityClass = s.AuthorityClass,
-                    LevelClass = s.LevelClass,
-                    OrgType = s.OrgType,
-                    CoEdStatus = s.CoEdStatus,
-                    TotalStudents = s.TotalStudents,
-                    EqiIndex = s.EqiIndex,
-                    Url = s.Url,
-                    AddressLine1 = s.AddressLine1,
-                    AddressSuburb = s.AddressSuburb,
-                    Status = s.Status,
-                    Latitude = s.Latitude,
-                    Longitude = s.Longitude,
-                    Region = s.Region,
-                    TerritorialAuthority = s.TerritorialAuthority,
-                    City = s.City,
-                    UeRate = s.UeRate,
-                },
-                Progression = s.TertiaryProgressions.FirstOrDefault(p => p.Year == tertiaryYear),
-            })
+            .ProjectTo<SchoolDetailDTO>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync();
 
-        if (row is null)
+        if (school is null)
         {
             return NotFound();
         }
 
-        var school = row.Detail;
-        ApplyTertiaryProgression2023(school, row.Progression);
+        var progression = await context
+            .SchoolTertiaryProgressions.AsNoTracking()
+            .FirstOrDefaultAsync(p => p.SchoolId == schoolId && p.Year == tertiaryYear);
+        ApplyTertiaryProgression2023(school, progression);
 
         const int targetYear = 2025;
 
@@ -239,28 +220,7 @@ public class SchoolsController : ControllerBase
         var items = await queryable
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(s => new SchoolDTO
-            {
-                Id = s.Id,
-                SchoolId = s.SchoolId,
-                Name = s.Name,
-                AuthorityClass = s.AuthorityClass,
-                LevelClass = s.LevelClass,
-                OrgType = s.OrgType,
-                CoEdStatus = s.CoEdStatus,
-                TotalStudents = s.TotalStudents,
-                EqiIndex = s.EqiIndex,
-                Url = s.Url,
-                AddressLine1 = s.AddressLine1,
-                AddressSuburb = s.AddressSuburb,
-                Status = s.Status,
-                Latitude = s.Latitude,
-                Longitude = s.Longitude,
-                Region = s.Region,
-                TerritorialAuthority = s.TerritorialAuthority,
-                City = s.City,
-                UeRate = s.UeRate,
-            })
+            .ProjectTo<SchoolDTO>(mapper.ConfigurationProvider)
             .ToListAsync();
 
         return new PaginationResult<SchoolDTO>

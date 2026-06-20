@@ -62,54 +62,57 @@ builder
         );
     });
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
+if (builder.Environment.IsDevelopment())
 {
-    options.UseAllOfToExtendReferenceSchemas();
-    options.SupportNonNullableReferenceTypes();
-    options.DescribeAllParametersInCamelCase();
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(options =>
+    {
+        options.UseAllOfToExtendReferenceSchemas();
+        options.SupportNonNullableReferenceTypes();
+        options.DescribeAllParametersInCamelCase();
 
-    // API 基本信息
-    options.SwaggerDoc(
-        "v1",
-        new OpenApiInfo
-        {
-            Title = "Thisiscz API",
-            Version = "v1",
-            Description = "Thisiscz 后端 API 文档",
-        }
-    );
-
-    // 添加 JWT Bearer 认证支持
-    options.AddSecurityDefinition(
-        "Bearer",
-        new OpenApiSecurityScheme
-        {
-            Description = "JWT 授权头使用 Bearer 方案。例如: \"Authorization: Bearer {token}\"",
-            Name = "Authorization",
-            In = ParameterLocation.Header,
-            Type = SecuritySchemeType.ApiKey,
-            Scheme = "Bearer",
-        }
-    );
-
-    options.AddSecurityRequirement(
-        new OpenApiSecurityRequirement
-        {
+        // API 基本信息
+        options.SwaggerDoc(
+            "v1",
+            new OpenApiInfo
             {
-                new OpenApiSecurityScheme
+                Title = "Thisiscz API",
+                Version = "v1",
+                Description = "Thisiscz 后端 API 文档",
+            }
+        );
+
+        // 添加 JWT Bearer 认证支持
+        options.AddSecurityDefinition(
+            "Bearer",
+            new OpenApiSecurityScheme
+            {
+                Description = "JWT 授权头使用 Bearer 方案。例如: \"Authorization: Bearer {token}\"",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer",
+            }
+        );
+
+        options.AddSecurityRequirement(
+            new OpenApiSecurityRequirement
+            {
                 {
-                    Reference = new OpenApiReference
+                    new OpenApiSecurityScheme
                     {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer",
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer",
+                        },
                     },
+                    Array.Empty<string>()
                 },
-                Array.Empty<string>()
-            },
-        }
-    );
-});
+            }
+        );
+    });
+}
 
 // 这只是配置了输出缓存服务的全局默认策略（默认过期时间 60 秒），并不会自动对所有接口都进行缓存。
 // 实际要缓存哪些接口，需要在对应的 Controller/Action 上使用 [OutputCache] 特性标记。
@@ -246,12 +249,11 @@ if (databaseProvider == "sqlite")
 }
 
 // Configure the HTTP request pipeline.
-// if (app.Environment.IsDevelopment())
-// {
-app.UseSwagger();
-app.UseSwaggerUI();
-
-// }
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseCors();
 

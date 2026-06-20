@@ -24,5 +24,8 @@ public class AutoMapperProfiles : Profile
 
         CreateMap<LinkCreationDTO, Link>().ForMember(dest => dest.UserId, opt => opt.Ignore()); // 更新时不应改变创建者
         CreateMap<Link, LinkDTO>();
+
+        CreateMap<School, SchoolDTO>();
+        CreateMap<School, SchoolDetailDTO>();
     }
 }
