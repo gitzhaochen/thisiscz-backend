@@ -1,9 +1,12 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 using ThisisczApi.DTOs;
+using ThisisczApi.Entities;
 using ThisisczApi.Utilities;
 
 namespace ThisisczApi.Controllers;
@@ -26,6 +29,17 @@ public class CarsController : ControllerBase
         this.context = context;
         this.mapper = mapper;
         this.outputCacheStore = outputCacheStore;
+    }
+
+    [HttpPost("create")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
+    public async Task<ActionResult> Create([FromBody] CarCreationDTO carCreationDTO)
+    {
+        var car = mapper.Map<Car>(carCreationDTO);
+        context.Cars.Add(car);
+        await context.SaveChangesAsync();
+        await outputCacheStore.EvictByTagAsync(cacheKey, default);
+        return NoContent();
     }
 
     [HttpGet]
@@ -128,5 +142,61 @@ public class CarsController : ControllerBase
             TotalCount = totalCount,
             Items = items,
         };
+    }
+
+    [HttpGet("{id:int}")]
+    [OutputCache(Tags = [cacheKey])]
+    public async Task<ActionResult<CarDTO>> GetDetail(int id)
+    {
+        var car = await context
+            .Cars.AsNoTracking()
+            .Where(x => x.Id == id)
+            .ProjectTo<CarDTO>(mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync();
+
+        if (car is null)
+        {
+            return NotFound(new { error = "Car not found" });
+        }
+
+        return car;
+    }
+
+    [HttpPut("{id:int}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
+    public async Task<ActionResult> Update(int id, [FromBody] CarCreationDTO carCreationDTO)
+    {
+        var car = await context.Cars.FirstOrDefaultAsync(x => x.Id == id);
+        if (car is null)
+        {
+            return NotFound(new { error = "Car not found" });
+        }
+
+        var originalStatus = car.Status;
+        mapper.Map(carCreationDTO, car);
+        car.Status = originalStatus;
+        car.UpdatedAt = DateTime.UtcNow;
+
+        await context.SaveChangesAsync();
+        await outputCacheStore.EvictByTagAsync(cacheKey, default);
+        return NoContent();
+    }
+
+    [HttpPatch("{id:int}/status")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
+    public async Task<ActionResult> UpdateStatus(int id, [FromBody] CarStatusUpdateDTO carStatusUpdateDTO)
+    {
+        var car = await context.Cars.FirstOrDefaultAsync(x => x.Id == id);
+        if (car is null)
+        {
+            return NotFound(new { error = "Car not found" });
+        }
+
+        car.Status = carStatusUpdateDTO.Status;
+        car.UpdatedAt = DateTime.UtcNow;
+
+        await context.SaveChangesAsync();
+        await outputCacheStore.EvictByTagAsync(cacheKey, default);
+        return NoContent();
     }
 }

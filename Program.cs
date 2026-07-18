@@ -15,13 +15,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
-if (args.Contains("--sync-prod-to-sqlite", StringComparer.OrdinalIgnoreCase))
-{
-    var exitCode = await SqliteProductionSync.RunAsync(builder.Configuration);
-    Environment.ExitCode = exitCode;
-    return;
-}
-
 if (args.Contains("--import-nzschool-data", StringComparer.OrdinalIgnoreCase))
 {
     var exitCode = await NzSchoolDataImportService.RunAsync(builder.Configuration);
@@ -162,35 +155,32 @@ var databaseProvider =
 var postgresConnectionString = builder.Configuration.GetConnectionString(
     "POSTGRES_CONNECTIONSTRING"
 );
-var sqliteConnectionString = builder.Configuration.GetConnectionString("SQLITE_CONNECTIONSTRING");
+
+if (databaseProvider != "postgres")
+{
+    throw new InvalidOperationException("This API runtime now supports only postgres.");
+}
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    if (databaseProvider == "sqlite")
-    {
-        options.UseSqlite(sqliteConnectionString);
-    }
-    else
-    {
-        // 启用 Npgsql 旧版时间戳行为，兼容 DateTime 类型（避免 Kind 必须为 UTC 的限制）
-        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+    // 启用 Npgsql 旧版时间戳行为，兼容 DateTime 类型（避免 Kind 必须为 UTC 的限制）
+    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-        options.UseNpgsql(
-            postgresConnectionString,
-            npgsqlOptions =>
-            {
-                npgsqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 5,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorCodesToAdd: null
-                );
-                // 设置命令超时时间为 30 秒，避免长时间占用数据库资源
-                npgsqlOptions.CommandTimeout(30);
-                // 启用查询缓存和编译优化，减少重复查询的执行时间
-                npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
-            }
-        );
-    }
+    options.UseNpgsql(
+        postgresConnectionString,
+        npgsqlOptions =>
+        {
+            npgsqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorCodesToAdd: null
+            );
+            // 设置命令超时时间为 30 秒，避免长时间占用数据库资源
+            npgsqlOptions.CommandTimeout(30);
+            // 启用查询缓存和编译优化，减少重复查询的执行时间
+            npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+        }
+    );
 
     options
         // 启用服务提供者缓存，提升 DbContext 创建性能
@@ -240,13 +230,6 @@ builder.Services.AddAuthorization(options =>
 });
 
 var app = builder.Build();
-
-if (databaseProvider == "sqlite")
-{
-    using var scope = app.Services.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    await dbContext.Database.EnsureCreatedAsync();
-}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

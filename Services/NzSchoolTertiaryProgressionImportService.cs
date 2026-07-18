@@ -21,24 +21,13 @@ public static class NzSchoolTertiaryProgressionImportService
             return 1;
         }
 
-        var databaseProvider =
-            configuration.GetValue<string>("DatabaseProvider")?.Trim().ToLowerInvariant()
-            ?? "postgres";
         var postgresConnectionString = configuration.GetConnectionString(
             "POSTGRES_CONNECTIONSTRING"
         );
-        var sqliteConnectionString = configuration.GetConnectionString("SQLITE_CONNECTIONSTRING");
 
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-        if (databaseProvider == "sqlite")
-        {
-            optionsBuilder.UseSqlite(sqliteConnectionString);
-        }
-        else
-        {
-            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-            optionsBuilder.UseNpgsql(postgresConnectionString);
-        }
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        optionsBuilder.UseNpgsql(postgresConnectionString);
 
         await using var db = new ApplicationDbContext(optionsBuilder.Options);
 

@@ -9,7 +9,7 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
     public ApplicationDbContext CreateDbContext(string[] args)
     {
         // Design-time defaults to postgres (appsettings.json). Load Local.json for
-        // real connection strings; do not load Development.json (sqlite corrupts migrations).
+        // developer overrides so EF commands target the same provider as production.
         var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false)
@@ -17,21 +17,10 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
             .AddEnvironmentVariables()
             .Build();
 
-        var databaseProvider =
-            configuration.GetValue<string>("DatabaseProvider")?.Trim().ToLowerInvariant()
-            ?? "postgres";
-
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
-        if (databaseProvider == "sqlite")
-        {
-            optionsBuilder.UseSqlite(configuration.GetConnectionString("SQLITE_CONNECTIONSTRING"));
-        }
-        else
-        {
-            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-            optionsBuilder.UseNpgsql(configuration.GetConnectionString("POSTGRES_CONNECTIONSTRING"));
-        }
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        optionsBuilder.UseNpgsql(configuration.GetConnectionString("POSTGRES_CONNECTIONSTRING"));
 
         return new ApplicationDbContext(optionsBuilder.Options);
     }

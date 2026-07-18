@@ -5,7 +5,7 @@ ASP.NET Core 8 Web API for users, posts, comments, links, and health checks.
 ## Stack
 
 - .NET 8 / ASP.NET Core
-- EF Core + PostgreSQL / SQLite
+- EF Core + PostgreSQL
 - ASP.NET Identity + JWT
 - Swagger
 - Docker
@@ -23,43 +23,28 @@ Swagger: `http://localhost:5239/swagger` (port may vary by your local config)
 
 Use environment variables in production (Render), and local secrets/local file for development.
 
-- `DatabaseProvider` (`postgres` or `sqlite`)
+- `DatabaseProvider` (`postgres`)
 - `ConnectionStrings__POSTGRES_CONNECTIONSTRING`
-- `ConnectionStrings__SQLITE_CONNECTIONSTRING` (e.g. `Data Source=data/thisiscz-dev.db`)
 - `Jwt__Key`
 
-## Development with SQLite
+## Development with Postgres (recommended)
 
-Set `DatabaseProvider` to `sqlite` in development config, then run:
+Set `DatabaseProvider` to `postgres` in development config, then run:
 
 ```bash
 dotnet run
 ```
 
-The app uses `EnsureCreated` for SQLite. It auto-creates the schema only when the
-SQLite file is new/empty.
+Apply latest migrations to your development Postgres:
+
+```bash
+DatabaseProvider=postgres dotnet ef database update
+```
 
 ### Important rule (avoid PendingModelChangesWarning)
 
-- SQLite local development: use `dotnet run` or `--sync-prod-to-sqlite`
-- PostgreSQL: use EF migrations (`dotnet ef ...`)
-- Do **not** run `dotnet ef database update` with `DatabaseProvider=sqlite`
-
-If local SQLite is missing newly added tables, rebuild local SQLite:
-
-```bash
-rm -f data/thisiscz-dev.db data/thisiscz-dev.db-shm data/thisiscz-dev.db-wal
-dotnet run
-```
-
-## Sync production Postgres to local SQLite
-
-```bash
-dotnet run -- --sync-prod-to-sqlite
-```
-
-This command reads from `POSTGRES_CONNECTIONSTRING` and rebuilds the SQLite file
-defined by `SQLITE_CONNECTIONSTRING`.
+- Local/production should both use PostgreSQL for schema consistency
+- Keep EF migrations aligned with PostgreSQL only
 
 ## Import NZ school CSV data to local DB tables
 
@@ -68,10 +53,12 @@ dotnet run -- --import-nzschool-data
 ```
 
 This command imports:
+
 - `docs/schooldirectory-07-06-2026-074525.csv` -> `schools`
 - `docs/10-Machine Readable-Roll by Funding year level ethnicity 2025.csv` -> `roll_ethnicity_fact`
 
 You can override paths via config:
+
 - `NzSchoolImport:SchoolDirectoryCsvPath`
 - `NzSchoolImport:RollCsvPath`
 
@@ -81,7 +68,18 @@ PostgreSQL migrations only:
 
 ```bash
 dotnet ef migrations add <MigrationName>
-DatabaseProvider=postgres dotnet ef database update
+dotnet ef database update
+```
+
+## Sync prod data to dev Postgres
+
+This script exports production `public` schema and restores it into development.
+It will overwrite development data.
+
+```bash
+export PROD_DB_URL='postgresql://...'
+export DEV_DB_URL='postgresql://...'
+./scripts/import-prod-to-dev-postgres.sh
 ```
 
 ## Deploy to Render

@@ -74,7 +74,7 @@ ThisisczApi/                           # ← 仓库根 = 项目根
 │   ├── PostDTO.cs / PostCreationDTO.cs / PostQueryDTO.cs / PostLikeCreationDTO.cs
 │   ├── CommentDTO.cs / CommentCreationDTO.cs / CommentQueryDTO.cs
 │   ├── LinkDTO.cs / LinkCreationDTO.cs / LinkQueryDTO.cs
-│   ├── CarDTO.cs / CarQueryDTO.cs
+│   ├── CarDTO.cs / CarCreationDTO.cs / CarQueryDTO.cs / CarStatusUpdateDTO.cs
 │   ├── UserDTO.cs / UserCredentialsDTO.cs / GoogleLoginDTO.cs
 │   └── AuthenticationResponseDTO.cs
 │
@@ -268,6 +268,10 @@ var user = await usersService.GetCurrentUser();   // 返回 UserDTO（含 Id / E
 | **PUT**    | `/api/links/{id}`                                 | admin                                     | 更新（`UserId` 不可被覆盖）                     |
 | **DELETE** | `/api/links/{id}`                                 | admin                                     | 删除                                            |
 | **GET**    | `/api/cars?page=&pageSize=&manufacturer=&model=&country=&city=&sellerType=&status=&transmission=&fuelType=&sourcePlatform=&minPrice=&maxPrice=&minYear=&maxYear=&minMileageKm=&maxMileageKm=` | 公开 | 二手车列表分页 + 多条件筛选 |
+| **GET**    | `/api/cars/{id}`                                  | 公开                                      | 车辆详情                                        |
+| **POST**   | `/api/cars/create`                                | admin                                     | 新增车辆                                        |
+| **PUT**    | `/api/cars/{id}`                                  | admin                                     | 更新车辆基础信息（不含状态）                    |
+| **PATCH**  | `/api/cars/{id}/status`                           | admin                                     | 更新车辆状态（在售/已售/下架）                  |
 | **GET**    | `/api/health/live`                                | 公开                                      | 纯服务存活检查（不依赖数据库）                  |
 | **GET**    | `/api/health/database`                            | 公开                                      | 数据库连通性检查                                |
 

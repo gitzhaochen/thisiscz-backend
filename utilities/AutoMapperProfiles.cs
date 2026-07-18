@@ -28,6 +28,7 @@ public class AutoMapperProfiles : Profile
         CreateMap<School, SchoolDTO>();
         CreateMap<School, SchoolDetailDTO>();
 
+        CreateMap<CarCreationDTO, Car>();
         CreateMap<Car, CarDTO>();
     }
 }
