@@ -66,6 +66,7 @@ ThisisczApi/                           # ← 仓库根 = 项目根
 │   ├── PostLike.cs
 │   ├── Comment.cs                      # 自引用：ParentId → Comment.Id
 │   ├── Link.cs        + enum LinkCategory
+│   ├── Car.cs         + enum SellerType/TransmissionType/FuelType/SourcePlatformType/CarStatus
 │   └── RefreshToken.cs                 # 已建表，但当前未使用（代码已注释）
 │
 ├── DTOs/                               # 请求/响应对象（与 Entity 严格分离）
@@ -73,6 +74,7 @@ ThisisczApi/                           # ← 仓库根 = 项目根
 │   ├── PostDTO.cs / PostCreationDTO.cs / PostQueryDTO.cs / PostLikeCreationDTO.cs
 │   ├── CommentDTO.cs / CommentCreationDTO.cs / CommentQueryDTO.cs
 │   ├── LinkDTO.cs / LinkCreationDTO.cs / LinkQueryDTO.cs
+│   ├── CarDTO.cs / CarQueryDTO.cs
 │   ├── UserDTO.cs / UserCredentialsDTO.cs / GoogleLoginDTO.cs
 │   └── AuthenticationResponseDTO.cs
 │
@@ -265,6 +267,7 @@ var user = await usersService.GetCurrentUser();   // 返回 UserDTO（含 Id / E
 | **POST**   | `/api/links/create`                               | admin                                     | 创建                                            |
 | **PUT**    | `/api/links/{id}`                                 | admin                                     | 更新（`UserId` 不可被覆盖）                     |
 | **DELETE** | `/api/links/{id}`                                 | admin                                     | 删除                                            |
+| **GET**    | `/api/cars?page=&pageSize=&manufacturer=&model=&country=&city=&sellerType=&status=&transmission=&fuelType=&sourcePlatform=&minPrice=&maxPrice=&minYear=&maxYear=&minMileageKm=&maxMileageKm=` | 公开 | 二手车列表分页 + 多条件筛选 |
 | **GET**    | `/api/health/live`                                | 公开                                      | 纯服务存活检查（不依赖数据库）                  |
 | **GET**    | `/api/health/database`                            | 公开                                      | 数据库连通性检查                                |
 

@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System.Text.Json;
 using ThisisczApi.Entities;
 
 namespace ThisisczApi;
@@ -18,6 +21,7 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<School> Schools { get; set; }
     public DbSet<RollEthnicityFact> RollEthnicityFacts { get; set; }
     public DbSet<SchoolTertiaryProgression> SchoolTertiaryProgressions { get; set; }
+    public DbSet<Car> Cars { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -74,6 +78,64 @@ public class ApplicationDbContext : IdentityDbContext
             .WithMany()
             .HasForeignKey(l => l.UserId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        var imageUrlsConverter = new ValueConverter<List<string>, string>(
+            v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+            v =>
+                JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions?)null)
+                ?? new List<string>()
+        );
+        var imageUrlsComparer = new ValueComparer<List<string>>(
+            (left, right) => left != null && right != null && left.SequenceEqual(right),
+            value => value.Aggregate(0, (hash, item) => HashCode.Combine(hash, item.GetHashCode())),
+            value => value.ToList()
+        );
+
+        modelBuilder
+            .Entity<Car>()
+            .Property(c => c.ImageUrls)
+            .HasConversion(imageUrlsConverter)
+            .Metadata.SetValueComparer(imageUrlsComparer);
+
+        modelBuilder.Entity<Car>().Property(c => c.Currency).HasMaxLength(10).IsRequired();
+        modelBuilder.Entity<Car>().Property(c => c.Manufacturer).HasMaxLength(100).IsRequired();
+        modelBuilder.Entity<Car>().Property(c => c.Model).HasMaxLength(100).IsRequired();
+        modelBuilder.Entity<Car>().Property(c => c.Country).HasMaxLength(80).IsRequired();
+        modelBuilder.Entity<Car>().Property(c => c.City).HasMaxLength(80).IsRequired();
+        modelBuilder.Entity<Car>().Property(c => c.ContactPhone).HasMaxLength(30);
+        modelBuilder.Entity<Car>().Property(c => c.ContactWechat).HasMaxLength(100);
+        modelBuilder.Entity<Car>().Property(c => c.ContactEmail).HasMaxLength(255);
+        modelBuilder.Entity<Car>().Property(c => c.EngineDisplacementL).HasPrecision(3, 1);
+        modelBuilder.Entity<Car>().Property(c => c.Price).HasPrecision(12, 2);
+        modelBuilder.Entity<Car>().Property(c => c.SourceUrl).HasMaxLength(1000).IsRequired();
+        modelBuilder.Entity<Car>().Property(c => c.PostTitle).HasMaxLength(255).IsRequired();
+
+        modelBuilder.Entity<Car>().HasIndex(c => c.CreatedAt).HasDatabaseName("IX_Cars_CreatedAt");
+        modelBuilder.Entity<Car>().HasIndex(c => c.Price).HasDatabaseName("IX_Cars_Price");
+        modelBuilder.Entity<Car>().HasIndex(c => c.Year).HasDatabaseName("IX_Cars_Year");
+        modelBuilder.Entity<Car>().HasIndex(c => c.MileageKm).HasDatabaseName("IX_Cars_MileageKm");
+        modelBuilder
+            .Entity<Car>()
+            .HasIndex(c => c.Manufacturer)
+            .HasDatabaseName("IX_Cars_Manufacturer");
+        modelBuilder.Entity<Car>().HasIndex(c => c.Model).HasDatabaseName("IX_Cars_Model");
+        modelBuilder
+            .Entity<Car>()
+            .HasIndex(c => c.SellerType)
+            .HasDatabaseName("IX_Cars_SellerType");
+        modelBuilder
+            .Entity<Car>()
+            .HasIndex(c => c.Status)
+            .HasDatabaseName("IX_Cars_Status");
+        modelBuilder
+            .Entity<Car>()
+            .HasIndex(c => c.SourcePlatform)
+            .HasDatabaseName("IX_Cars_SourcePlatform");
+        modelBuilder
+            .Entity<Car>()
+            .HasIndex(c => c.SourceUrl)
+            .IsUnique()
+            .HasDatabaseName("IX_Cars_SourceUrl");
 
         modelBuilder.Entity<School>().ToTable("schools");
         modelBuilder.Entity<School>().HasKey(s => s.Id);

@@ -36,7 +36,21 @@ Set `DatabaseProvider` to `sqlite` in development config, then run:
 dotnet run
 ```
 
-The app will auto-create the SQLite schema file if it does not exist.
+The app uses `EnsureCreated` for SQLite. It auto-creates the schema only when the
+SQLite file is new/empty.
+
+### Important rule (avoid PendingModelChangesWarning)
+
+- SQLite local development: use `dotnet run` or `--sync-prod-to-sqlite`
+- PostgreSQL: use EF migrations (`dotnet ef ...`)
+- Do **not** run `dotnet ef database update` with `DatabaseProvider=sqlite`
+
+If local SQLite is missing newly added tables, rebuild local SQLite:
+
+```bash
+rm -f data/thisiscz-dev.db data/thisiscz-dev.db-shm data/thisiscz-dev.db-wal
+dotnet run
+```
 
 ## Sync production Postgres to local SQLite
 
@@ -63,9 +77,11 @@ You can override paths via config:
 
 ## Database Migrations
 
+PostgreSQL migrations only:
+
 ```bash
 dotnet ef migrations add <MigrationName>
-dotnet ef database update
+DatabaseProvider=postgres dotnet ef database update
 ```
 
 ## Deploy to Render

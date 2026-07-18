@@ -218,6 +218,140 @@ namespace ThisisczApi.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("ThisisczApi.Entities.Car", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.Property<string>("ContactEmail")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("ContactPhone")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("ContactWechat")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<decimal?>("EngineDisplacementL")
+                        .HasPrecision(3, 1)
+                        .HasColumnType("numeric(3,1)");
+
+                    b.Property<int>("FuelType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ImageUrls")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Manufacturer")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("MileageKm")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("PostContent")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PostTitle")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)");
+
+                    b.Property<int>("SellerType")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SourcePlatform")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SourceUrl")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Transmission")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt")
+                        .HasDatabaseName("IX_Cars_CreatedAt");
+
+                    b.HasIndex("Manufacturer")
+                        .HasDatabaseName("IX_Cars_Manufacturer");
+
+                    b.HasIndex("MileageKm")
+                        .HasDatabaseName("IX_Cars_MileageKm");
+
+                    b.HasIndex("Model")
+                        .HasDatabaseName("IX_Cars_Model");
+
+                    b.HasIndex("Price")
+                        .HasDatabaseName("IX_Cars_Price");
+
+                    b.HasIndex("SellerType")
+                        .HasDatabaseName("IX_Cars_SellerType");
+
+                    b.HasIndex("SourcePlatform")
+                        .HasDatabaseName("IX_Cars_SourcePlatform");
+
+                    b.HasIndex("SourceUrl")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Cars_SourceUrl");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_Cars_Status");
+
+                    b.HasIndex("Year")
+                        .HasDatabaseName("IX_Cars_Year");
+
+                    b.ToTable("Cars");
+                });
+
             modelBuilder.Entity("ThisisczApi.Entities.Comment", b =>
                 {
                     b.Property<int>("Id")
