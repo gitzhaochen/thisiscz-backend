@@ -14,7 +14,7 @@ public enum TransmissionType
 
 public enum FuelType
 {
-    Gasoline,
+    Petrol,
     Diesel,
     Hybrid,
     Phev,
