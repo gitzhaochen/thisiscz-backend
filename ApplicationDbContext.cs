@@ -105,10 +105,12 @@ public class ApplicationDbContext : IdentityDbContext
         modelBuilder.Entity<Car>().Property(c => c.ContactPhone).HasMaxLength(30);
         modelBuilder.Entity<Car>().Property(c => c.ContactWechat).HasMaxLength(100);
         modelBuilder.Entity<Car>().Property(c => c.ContactEmail).HasMaxLength(255);
+        modelBuilder.Entity<Car>().Property(c => c.ParseSourceUrl).HasMaxLength(1000);
         modelBuilder.Entity<Car>().Property(c => c.EngineDisplacementL).HasPrecision(3, 1);
         modelBuilder.Entity<Car>().Property(c => c.Price).HasPrecision(12, 2);
         modelBuilder.Entity<Car>().Property(c => c.SourceUrl).HasMaxLength(1000).IsRequired();
         modelBuilder.Entity<Car>().Property(c => c.PostTitle).HasMaxLength(255).IsRequired();
+        modelBuilder.Entity<Car>().Property(c => c.PublicId).HasMaxLength(16).IsRequired();
 
         modelBuilder.Entity<Car>().HasIndex(c => c.CreatedAt).HasDatabaseName("IX_Cars_CreatedAt");
         modelBuilder.Entity<Car>().HasIndex(c => c.Price).HasDatabaseName("IX_Cars_Price");
@@ -119,6 +121,7 @@ public class ApplicationDbContext : IdentityDbContext
             .HasIndex(c => c.Manufacturer)
             .HasDatabaseName("IX_Cars_Manufacturer");
         modelBuilder.Entity<Car>().HasIndex(c => c.Model).HasDatabaseName("IX_Cars_Model");
+        modelBuilder.Entity<Car>().HasIndex(c => c.PublicId).IsUnique().HasDatabaseName("IX_Cars_PublicId");
         modelBuilder
             .Entity<Car>()
             .HasIndex(c => c.SellerType)

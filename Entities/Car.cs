@@ -37,6 +37,7 @@ public enum CarStatus
 public class Car
 {
     public int Id { get; set; }
+    public string PublicId { get; set; } = Guid.NewGuid().ToString("N")[..16];
     public decimal Price { get; set; }
     public string Currency { get; set; } = "CNY";
     public int Year { get; set; }
@@ -54,6 +55,7 @@ public class Car
     public SellerType SellerType { get; set; }
     public CarStatus Status { get; set; } = CarStatus.Active;
     public SourcePlatformType SourcePlatform { get; set; } = SourcePlatformType.Xiaohongshu;
+    public string? ParseSourceUrl { get; set; }
     public string SourceUrl { get; set; } = string.Empty;
     public string PostTitle { get; set; } = string.Empty;
     public string PostContent { get; set; } = string.Empty;

@@ -20,6 +20,7 @@ public class CarCreationDTO
     public string City { get; set; } = string.Empty;
     public SellerType SellerType { get; set; }
     public SourcePlatformType SourcePlatform { get; set; } = SourcePlatformType.Xiaohongshu;
+    public string? ParseSourceUrl { get; set; }
     public string SourceUrl { get; set; } = string.Empty;
     public string PostTitle { get; set; } = string.Empty;
     public string PostContent { get; set; } = string.Empty;

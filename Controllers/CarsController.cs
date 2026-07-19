@@ -144,13 +144,18 @@ public class CarsController : ControllerBase
         };
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{publicId}")]
     [OutputCache(Tags = [cacheKey])]
-    public async Task<ActionResult<CarDTO>> GetDetail(int id)
+    public async Task<ActionResult<CarDTO>> GetDetail(string publicId)
     {
+        if (string.IsNullOrWhiteSpace(publicId))
+        {
+            return BadRequest(new { error = "publicId is required" });
+        }
+
         var car = await context
             .Cars.AsNoTracking()
-            .Where(x => x.Id == id)
+            .Where(x => x.PublicId == publicId)
             .ProjectTo<CarDTO>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync();
 
@@ -162,11 +167,16 @@ public class CarsController : ControllerBase
         return car;
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("{publicId}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
-    public async Task<ActionResult> Update(int id, [FromBody] CarCreationDTO carCreationDTO)
+    public async Task<ActionResult> Update(string publicId, [FromBody] CarCreationDTO carCreationDTO)
     {
-        var car = await context.Cars.FirstOrDefaultAsync(x => x.Id == id);
+        if (string.IsNullOrWhiteSpace(publicId))
+        {
+            return BadRequest(new { error = "publicId is required" });
+        }
+
+        var car = await context.Cars.FirstOrDefaultAsync(x => x.PublicId == publicId);
         if (car is null)
         {
             return NotFound(new { error = "Car not found" });
@@ -182,11 +192,16 @@ public class CarsController : ControllerBase
         return NoContent();
     }
 
-    [HttpPatch("{id:int}/status")]
+    [HttpPatch("{publicId}/status")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
-    public async Task<ActionResult> UpdateStatus(int id, [FromBody] CarStatusUpdateDTO carStatusUpdateDTO)
+    public async Task<ActionResult> UpdateStatus(string publicId, [FromBody] CarStatusUpdateDTO carStatusUpdateDTO)
     {
-        var car = await context.Cars.FirstOrDefaultAsync(x => x.Id == id);
+        if (string.IsNullOrWhiteSpace(publicId))
+        {
+            return BadRequest(new { error = "publicId is required" });
+        }
+
+        var car = await context.Cars.FirstOrDefaultAsync(x => x.PublicId == publicId);
         if (car is null)
         {
             return NotFound(new { error = "Car not found" });
@@ -195,6 +210,27 @@ public class CarsController : ControllerBase
         car.Status = carStatusUpdateDTO.Status;
         car.UpdatedAt = DateTime.UtcNow;
 
+        await context.SaveChangesAsync();
+        await outputCacheStore.EvictByTagAsync(cacheKey, default);
+        return NoContent();
+    }
+
+    [HttpDelete("{publicId}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
+    public async Task<ActionResult> Delete(string publicId)
+    {
+        if (string.IsNullOrWhiteSpace(publicId))
+        {
+            return BadRequest(new { error = "publicId is required" });
+        }
+
+        var car = await context.Cars.FirstOrDefaultAsync(x => x.PublicId == publicId);
+        if (car is null)
+        {
+            return NotFound(new { error = "Car not found" });
+        }
+
+        context.Cars.Remove(car);
         await context.SaveChangesAsync();
         await outputCacheStore.EvictByTagAsync(cacheKey, default);
         return NoContent();

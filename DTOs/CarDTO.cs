@@ -4,7 +4,7 @@ namespace ThisisczApi.DTOs;
 
 public class CarDTO
 {
-    public int Id { get; set; }
+    public string PublicId { get; set; } = string.Empty;
     public decimal Price { get; set; }
     public string Currency { get; set; } = string.Empty;
     public int Year { get; set; }
@@ -22,6 +22,7 @@ public class CarDTO
     public SellerType SellerType { get; set; }
     public CarStatus Status { get; set; }
     public SourcePlatformType SourcePlatform { get; set; }
+    public string? ParseSourceUrl { get; set; }
     public string SourceUrl { get; set; } = string.Empty;
     public string PostTitle { get; set; } = string.Empty;
     public string PostContent { get; set; } = string.Empty;
