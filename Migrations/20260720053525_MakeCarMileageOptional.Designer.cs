@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ThisisczApi;
@@ -11,9 +12,11 @@ using ThisisczApi;
 namespace ThisisczApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260720053525_MakeCarMileageOptional")]
+    partial class MakeCarMileageOptional
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,6 +230,7 @@ namespace ThisisczApi.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("City")
+                        .IsRequired()
                         .HasMaxLength(80)
                         .HasColumnType("character varying(80)");
 
@@ -243,6 +247,7 @@ namespace ThisisczApi.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("Country")
+                        .IsRequired()
                         .HasMaxLength(80)
                         .HasColumnType("character varying(80)");
 
@@ -250,6 +255,7 @@ namespace ThisisczApi.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Currency")
+                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)");
 
@@ -257,7 +263,7 @@ namespace ThisisczApi.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
-                    b.Property<int?>("FuelType")
+                    b.Property<int>("FuelType")
                         .HasColumnType("integer");
 
                     b.Property<string>("ImageUrls")
@@ -265,6 +271,7 @@ namespace ThisisczApi.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Manufacturer")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -272,6 +279,7 @@ namespace ThisisczApi.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("Model")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -280,9 +288,11 @@ namespace ThisisczApi.Migrations
                         .HasColumnType("character varying(1000)");
 
                     b.Property<string>("PostContent")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("PostTitle")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
@@ -295,26 +305,27 @@ namespace ThisisczApi.Migrations
                         .HasMaxLength(16)
                         .HasColumnType("character varying(16)");
 
-                    b.Property<int?>("SellerType")
+                    b.Property<int>("SellerType")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("SourcePlatform")
+                    b.Property<int>("SourcePlatform")
                         .HasColumnType("integer");
 
                     b.Property<string>("SourceUrl")
+                        .IsRequired()
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("Transmission")
+                    b.Property<int>("Transmission")
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<int?>("Year")
+                    b.Property<int>("Year")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");

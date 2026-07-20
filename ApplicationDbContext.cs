@@ -97,19 +97,19 @@ public class ApplicationDbContext : IdentityDbContext
             .HasConversion(imageUrlsConverter)
             .Metadata.SetValueComparer(imageUrlsComparer);
 
-        modelBuilder.Entity<Car>().Property(c => c.Currency).HasMaxLength(10).IsRequired();
-        modelBuilder.Entity<Car>().Property(c => c.Manufacturer).HasMaxLength(100).IsRequired();
-        modelBuilder.Entity<Car>().Property(c => c.Model).HasMaxLength(100).IsRequired();
-        modelBuilder.Entity<Car>().Property(c => c.Country).HasMaxLength(80).IsRequired();
-        modelBuilder.Entity<Car>().Property(c => c.City).HasMaxLength(80).IsRequired();
+        modelBuilder.Entity<Car>().Property(c => c.Currency).HasMaxLength(10);
+        modelBuilder.Entity<Car>().Property(c => c.Manufacturer).HasMaxLength(100);
+        modelBuilder.Entity<Car>().Property(c => c.Model).HasMaxLength(100);
+        modelBuilder.Entity<Car>().Property(c => c.Country).HasMaxLength(80);
+        modelBuilder.Entity<Car>().Property(c => c.City).HasMaxLength(80);
         modelBuilder.Entity<Car>().Property(c => c.ContactPhone).HasMaxLength(30);
         modelBuilder.Entity<Car>().Property(c => c.ContactWechat).HasMaxLength(100);
         modelBuilder.Entity<Car>().Property(c => c.ContactEmail).HasMaxLength(255);
         modelBuilder.Entity<Car>().Property(c => c.ParseSourceUrl).HasMaxLength(1000);
         modelBuilder.Entity<Car>().Property(c => c.EngineDisplacementL).HasMaxLength(20);
         modelBuilder.Entity<Car>().Property(c => c.Price).HasPrecision(12, 2);
-        modelBuilder.Entity<Car>().Property(c => c.SourceUrl).HasMaxLength(1000).IsRequired();
-        modelBuilder.Entity<Car>().Property(c => c.PostTitle).HasMaxLength(255).IsRequired();
+        modelBuilder.Entity<Car>().Property(c => c.SourceUrl).HasMaxLength(1000);
+        modelBuilder.Entity<Car>().Property(c => c.PostTitle).HasMaxLength(255);
         modelBuilder.Entity<Car>().Property(c => c.PublicId).HasMaxLength(16).IsRequired();
 
         modelBuilder.Entity<Car>().HasIndex(c => c.CreatedAt).HasDatabaseName("IX_Cars_CreatedAt");

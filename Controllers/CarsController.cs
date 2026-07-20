@@ -51,13 +51,13 @@ public class CarsController : ControllerBase
         if (!string.IsNullOrWhiteSpace(query.Manufacturer))
         {
             var manufacturer = query.Manufacturer.Trim();
-            queryable = queryable.Where(x => x.Manufacturer.Contains(manufacturer));
+            queryable = queryable.Where(x => x.Manufacturer != null && x.Manufacturer.Contains(manufacturer));
         }
 
         if (!string.IsNullOrWhiteSpace(query.Model))
         {
             var model = query.Model.Trim();
-            queryable = queryable.Where(x => x.Model.Contains(model));
+            queryable = queryable.Where(x => x.Model != null && x.Model.Contains(model));
         }
 
         if (!string.IsNullOrWhiteSpace(query.Country))
@@ -119,12 +119,12 @@ public class CarsController : ControllerBase
 
         if (query.MinMileageKm.HasValue)
         {
-            queryable = queryable.Where(x => x.MileageKm >= query.MinMileageKm.Value);
+            queryable = queryable.Where(x => x.MileageKm.HasValue && x.MileageKm.Value >= query.MinMileageKm.Value);
         }
 
         if (query.MaxMileageKm.HasValue)
         {
-            queryable = queryable.Where(x => x.MileageKm <= query.MaxMileageKm.Value);
+            queryable = queryable.Where(x => x.MileageKm.HasValue && x.MileageKm.Value <= query.MaxMileageKm.Value);
         }
 
         var totalCount = await queryable.CountAsync();
