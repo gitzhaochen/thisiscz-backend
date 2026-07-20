@@ -32,6 +32,7 @@ public enum CarStatus
     Active, // 在售
     Sold, // 已售
     OffShelf, // 下架
+    Pending, // 待售
 }
 
 public class Car
