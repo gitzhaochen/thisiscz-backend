@@ -11,7 +11,7 @@ public class CarCreationDTO
     public string Model { get; set; } = string.Empty;
     public int MileageKm { get; set; }
     public TransmissionType Transmission { get; set; }
-    public decimal? EngineDisplacementL { get; set; }
+    public string? EngineDisplacementL { get; set; }
     public FuelType FuelType { get; set; }
     public string? ContactPhone { get; set; }
     public string? ContactWechat { get; set; }

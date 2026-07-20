@@ -106,7 +106,7 @@ public class ApplicationDbContext : IdentityDbContext
         modelBuilder.Entity<Car>().Property(c => c.ContactWechat).HasMaxLength(100);
         modelBuilder.Entity<Car>().Property(c => c.ContactEmail).HasMaxLength(255);
         modelBuilder.Entity<Car>().Property(c => c.ParseSourceUrl).HasMaxLength(1000);
-        modelBuilder.Entity<Car>().Property(c => c.EngineDisplacementL).HasPrecision(3, 1);
+        modelBuilder.Entity<Car>().Property(c => c.EngineDisplacementL).HasMaxLength(20);
         modelBuilder.Entity<Car>().Property(c => c.Price).HasPrecision(12, 2);
         modelBuilder.Entity<Car>().Property(c => c.SourceUrl).HasMaxLength(1000).IsRequired();
         modelBuilder.Entity<Car>().Property(c => c.PostTitle).HasMaxLength(255).IsRequired();
