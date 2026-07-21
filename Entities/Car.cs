@@ -58,6 +58,7 @@ public class Car
     public SourcePlatformType? SourcePlatform { get; set; }
     public string? ParseSourceUrl { get; set; }
     public string? SourceUrl { get; set; }
+    public DateTime? OriginalPostPublishedAt { get; set; } = DateTime.UtcNow;
     public string? PostTitle { get; set; }
     public string? PostContent { get; set; }
     public List<string> ImageUrls { get; set; } = [];

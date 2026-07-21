@@ -28,7 +28,11 @@ public class AutoMapperProfiles : Profile
         CreateMap<School, SchoolDTO>();
         CreateMap<School, SchoolDetailDTO>();
 
-        CreateMap<CarCreationDTO, Car>();
+        CreateMap<CarCreationDTO, Car>()
+            .ForMember(
+                dest => dest.OriginalPostPublishedAt,
+                opt => opt.Condition(src => src.OriginalPostPublishedAt.HasValue)
+            );
         CreateMap<Car, CarDTO>();
     }
 }
