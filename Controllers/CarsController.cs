@@ -51,7 +51,9 @@ public class CarsController : ControllerBase
         if (!string.IsNullOrWhiteSpace(query.Manufacturer))
         {
             var manufacturer = query.Manufacturer.Trim();
-            queryable = queryable.Where(x => x.Manufacturer != null && x.Manufacturer.Contains(manufacturer));
+            queryable = queryable.Where(x =>
+                x.Manufacturer != null && x.Manufacturer.Contains(manufacturer)
+            );
         }
 
         if (!string.IsNullOrWhiteSpace(query.Model))
@@ -119,17 +121,29 @@ public class CarsController : ControllerBase
 
         if (query.MinMileageKm.HasValue)
         {
-            queryable = queryable.Where(x => x.MileageKm.HasValue && x.MileageKm.Value >= query.MinMileageKm.Value);
+            queryable = queryable.Where(x =>
+                x.MileageKm.HasValue && x.MileageKm.Value >= query.MinMileageKm.Value
+            );
         }
 
         if (query.MaxMileageKm.HasValue)
         {
-            queryable = queryable.Where(x => x.MileageKm.HasValue && x.MileageKm.Value <= query.MaxMileageKm.Value);
+            queryable = queryable.Where(x =>
+                x.MileageKm.HasValue && x.MileageKm.Value <= query.MaxMileageKm.Value
+            );
         }
 
         var totalCount = await queryable.CountAsync();
+        var sortType = query.SortType?.Trim().ToLowerInvariant() ?? "latest";
+        queryable = sortType switch
+        {
+            "pricelow" => queryable
+                .OrderBy(x => x.Price)
+                .ThenByDescending(x => x.OriginalPostPublishedAt ?? x.CreatedAt),
+            _ => queryable.OrderByDescending(x => x.OriginalPostPublishedAt ?? x.CreatedAt),
+        };
+
         var items = await queryable
-            .OrderByDescending(x => x.OriginalPostPublishedAt ?? x.CreatedAt)
             .Skip((query.Page - 1) * query.PageSize)
             .Take(query.PageSize)
             .ProjectTo<CarDTO>(mapper.ConfigurationProvider)
@@ -169,7 +183,10 @@ public class CarsController : ControllerBase
 
     [HttpPut("{publicId}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
-    public async Task<ActionResult> Update(string publicId, [FromBody] CarCreationDTO carCreationDTO)
+    public async Task<ActionResult> Update(
+        string publicId,
+        [FromBody] CarCreationDTO carCreationDTO
+    )
     {
         if (string.IsNullOrWhiteSpace(publicId))
         {
@@ -194,7 +211,10 @@ public class CarsController : ControllerBase
 
     [HttpPatch("{publicId}/status")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "IsAdmin")]
-    public async Task<ActionResult> UpdateStatus(string publicId, [FromBody] CarStatusUpdateDTO carStatusUpdateDTO)
+    public async Task<ActionResult> UpdateStatus(
+        string publicId,
+        [FromBody] CarStatusUpdateDTO carStatusUpdateDTO
+    )
     {
         if (string.IsNullOrWhiteSpace(publicId))
         {

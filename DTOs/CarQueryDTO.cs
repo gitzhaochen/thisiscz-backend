@@ -19,4 +19,8 @@ public class CarQueryDTO : PaginationDTO
     public int? MaxYear { get; set; }
     public int? MinMileageKm { get; set; }
     public int? MaxMileageKm { get; set; }
+    /// <summary>
+    /// latest: OriginalPostPublishedAt desc; priceLow: Price asc
+    /// </summary>
+    public string? SortType { get; set; }
 }
