@@ -129,7 +129,7 @@ public class CarsController : ControllerBase
 
         var totalCount = await queryable.CountAsync();
         var items = await queryable
-            .OrderByDescending(x => x.CreatedAt)
+            .OrderByDescending(x => x.OriginalPostPublishedAt ?? x.CreatedAt)
             .Skip((query.Page - 1) * query.PageSize)
             .Take(query.PageSize)
             .ProjectTo<CarDTO>(mapper.ConfigurationProvider)
