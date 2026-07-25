@@ -12,8 +12,9 @@ WORKDIR /app
 
 COPY --from=build /app/publish .
 
-# Render will inject PORT at runtime.
 ENV ASPNETCORE_ENVIRONMENT=Production
-EXPOSE 10000
+# Fly.io / 多数 PaaS 默认 8080；若平台注入 PORT（如 Render）则优先用 PORT
+ENV ASPNETCORE_URLS=http://0.0.0.0:8080
+EXPOSE 8080
 
-ENTRYPOINT ["sh", "-c", "dotnet ThisisczApi.dll --urls http://0.0.0.0:${PORT:-10000}"]
+ENTRYPOINT ["sh", "-c", "dotnet ThisisczApi.dll --urls http://0.0.0.0:${PORT:-8080}"]

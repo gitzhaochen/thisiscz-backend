@@ -8,6 +8,11 @@ primary_region = 'iad'
 
 [build]
 
+[env]
+  ASPNETCORE_ENVIRONMENT = 'Production'
+  ASPNETCORE_URLS = 'http://0.0.0.0:8080'
+  PORT = '8080'
+
 [http_service]
   internal_port = 8080
   force_https = true
@@ -20,4 +25,3 @@ primary_region = 'iad'
   memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
-  memory_mb = 256
