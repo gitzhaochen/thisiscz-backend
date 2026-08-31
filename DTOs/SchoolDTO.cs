@@ -21,4 +21,5 @@ public class SchoolDTO
     public string? TerritorialAuthority { get; set; }
     public string? City { get; set; }
     public double? UeRate { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }
